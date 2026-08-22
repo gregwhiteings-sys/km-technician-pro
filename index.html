@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en-ZA">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Konica Minolta Technician Pro</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
+        :root {
+            --bg-dark: #121212;
+            --bg-card: #1e1e1e;
+            --bg-hover: #2a2a2a;
+            --accent-blue: #0066B3;
+            --accent-cyan: #00A3AD;
+            --text-primary: #ffffff;
+            --text-secondary: #b3b3b3;
+            --danger: #e53935;
+            --warning: #FF9800;
+            --success: #4CAF50;
+            --safe: #2196F3;
+        }
+        body { background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
+
+        /* ======================================
+           PASSWORD SCREEN
+           ====================================== */
+        #password-screen {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            min-height: 100vh; padding: 20px; text-align: center;
+        }
+        .password-box {
+            background: var(--bg-card); padding: 40px 30px; border-radius: 16px;
+            max-width: 400px; width: 100%; border: 1px solid #333;
+        }
+        .password-box h1 { font-size: 24px; margin-bottom: 5px; color: var(--accent-blue); }
+        .password-box h2 { font-size: 16px; font-weight: 400; color: var(--text-secondary); margin-bottom: 30px; }
+        .password-input {
+            width: 100%; padding: 14px; font-size: 16px; border-radius: 8px;
+            border: 1px solid #444; background: var(--bg-dark); color: white;
+            margin-bottom: 15px; text-align: center;
+        }
+        .btn-primary {
+            width: 100%; padding: 14px; font-size: 16px; font-weight: 600;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan));
+            color: white; border: none; border-radius: 8px; cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .btn-primary:hover { transform: scale(1.02); }
+        .btn-secondary {
+            padding: 10px 20px; font-size: 14px; background: #333; color: white;
+            border: none; border-radius: 6px; cursor: pointer; margin-top: 10px;
+        }
+        .version-label { font-size: 12px; color: var(--text-secondary); margin-top: 20px; }
+        .error-msg { color: var(--danger); margin-top: 12px; display: none; }
+        .disclaimer-text {
+            font-size: 11px; color: var(--text-secondary); margin-top: 20px; line-height: 1.5;
+        }
+
+        /* ======================================
+           MAIN APP LAYOUT
+           ====================================== */
+        #main-app { display: none; }
+        .app-header {
+            background: var(--bg-card); padding: 12px 20px; display: flex;
+            justify-content: space-between; align-items: center; position: sticky; top: 0;
+            border-bottom: 1px solid #333; z-index: 100;
+        }
+        .app-header h1 { font-size: 18px; color: var(--accent-blue); }
+        .header-actions { display: flex; gap: 10px; align-items: center; }
+        .search-bar {
+            flex: 1; max-width: 400px; margin: 0 20px;
+        }
+        .search-bar input {
+            width: 100%; padding: 10px 15px; border-radius: 8px; border: 1px solid #444;
+            background: var(--bg-dark); color: white; font-size: 15px;
+        }
+
+        /* Navigation */
+        .nav-container { position: sticky; top: 56px; background: var(--bg-card); padding: 10px; overflow-x: auto; border-bottom: 1px solid #333; }
+        .nav-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+        .nav-btn {
+            padding: 10px 14px; background: var(--bg-hover); color: white; border: none;
+            border-radius: 8px; font-size: 13px; cursor: pointer; white-space: nowrap;
+        }
+        .nav-btn:hover, .nav-btn.active { background: var(--accent-blue); }
+
+        /* Content Area */
+        .content-container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .page { display: none; }
+        .page.active { display: block; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* Dashboard */
+        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 20px; }
+        .dashboard-card {
+            background: var(--bg-card); padding: 20px; border-radius: 12px; cursor: pointer;
+            border: 1px solid #333; transition: transform 0.2s;
+        }
+        .dashboard-card:hover { transform: translateY(-3px); border-color: var(--accent-blue); }
+        .dashboard-card h3 { font-size: 16px; margin-bottom: 8px; }
+        .dashboard-card p { font-size: 13px; color: var(--text-secondary); }
+
+        .quick-lookup {
+            background: var(--bg-card); padding: 20px; border-radius: 12px; margin: 20px 0; border: 1px solid #333;
+        }
+        .code-tag {
+            display: inline-block; padding: 8px 16px; background: var(--bg-hover);
+            border-radius: 6px margin: 5px; cursor: pointer; font-family: monospace; font-size: 15px;
+        }
+        .code-tag:hover { background: var(--accent-blue); }
+
+        /* Data Cards */
+        .data-card {
+            background: var(--bg-card); border-radius: 12px; padding: 20px; margin-bottom: 15px;
+            border-left: 4px solid var(--accent-blue);
+        }
+        .data-card h3 { font-size: 18px; margin-bottom: 12px; color: var(--accent-cyan); }
+        .verification-note {
+            background: rgba(255, 152, 0, 0.1); border-left: 3px solid var(--warning);
+            padding: 10px; border-radius: 6px; font-size: 13px; margin: 10px 0;
+        }
+        .safety-warning {
+            background: rgba(229, 57, 53, 0.1); border-left: 3px solid var(--danger);
+            padding: 12px; border-radius: 6px; font-size: 13px; margin: 15px 0;
+        }
+
+        /* Workflow Steps */
+        .workflow-steps { display: flex; flex-wrap: wrap; gap: 8px; margin: 15px 0; }
+        .step-badge {
+            padding: 8px 14px; background: var(--bg-hover); border-radius: 20px; font-size: 13px;
+        }
+
+        /* Forms & Buttons */
+        textarea, input, select {
+            width: 100%; padding: 12px; background: var(--bg-dark); color: white;
+            border: 1px solid #444; border-radius: 8px; margin: 6px 0; font-size: 14px;
+        }
+        button.small { padding: 8px 14px; font-size: 13px; border-radius: 6px; }
+        .btn-green { background: var(--success); color: white; border: none; }
+        .btn-orange { background: var(--warning); color: white; border: none; }
+        .btn-red { background: var(--danger); color: white; border: none; }
+
+        /* Footer */
+        .app-footer {
+            text-align: center; padding: 20px; font-size: 12px; color: var(--text-secondary);
+            margin-top: 40px; border-top: 1px solid #333;
+        }
+
+        /* Print Styles */
+        @media print {
+            body { background: white; color: black; }
+            .nav-container, .app-header, .no-print { display: none !important; }
+            .content-container { max-width: 100%; }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .app-header { flex-wrap: wrap; gap: 10px; }
+            .search-bar { order: 3; width: 100%; margin: 10px 0 0 0; max-width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ==============================================
+     PASSWORD SCREEN
+     ============================================== -->
+<div id="password-screen">
+    <div class="password-box">
+        <h1>KONICA MINOLTA</h1>
+        <h2>TECHNICIAN PRO</h2>
+        <p style="color:var(--text-secondary); margin-bottom:20px;">Enter password to access</p>
+        <input type="password" class="password-input" id="app-password" placeholder="Enter password...">
+        <button class="btn-primary" onclick="checkPassword()">🔓 UNLOCK APP</button>
+        <p class="error-msg" id="wrong-pass">❌ Wrong password — try again!</p>
+        <p class="version-label">Version 1.0 • Database: Initial Demo</p>
+        <div class="disclaimer-text">
+            Independent technician reference tool.<br>Not affiliated with or endorsed by Konica Minolta.
+        </div>
+    </div>
+</div>
+
+<!-- ==============================================
+     MAIN APPLICATION
+     ============================================== -->
+<div id="main-app">
+    <!-- Header -->
+    <header class="app-header">
+        <h1>🖨️ KM Technician Pro</h1>
+        <div class="search-bar">
+            <input type="text" id="global-search" placeholder="🔍 Search model, error code, part number..." oninput="performGlobalSearch(this.value)">
+        </div>
+        <div class="header-actions">
+            <button class="btn-secondary" onclick="showPage('notes')">📝 Notes</button>
+            <button class="btn-secondary" onclick="showPage('bookmarks')">⭐ Bookmarks</button>
+            <button class="btn-secondary" onclick="logout()">🚪 Logout</button>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="nav-container">
+        <div class="nav-grid">
+            <button class="nav-btn active" onclick="showPage('dashboard')">📊 Dashboard</button>
+            <button class="nav-btn" onclick="showPage('models')">🖨️ Models</button>
+            <button class="nav-btn" onclick="showPage('errors')">⚠️ Error Codes</button>
+            <button class="nav-btn" onclick="showPage('jams')">📄 Jam Codes</button>
+            <button class="nav-btn" onclick="showPage('parts')">🔧 Parts Finder</button>
+            <button class="nav-btn" onclick="showPage('troubleshooting')">🔍 Troubleshooting</button>
+            <button class="nav-btn" onclick="showPage('maintenance')">🧰 Maintenance</button>
+            <button class="nav-btn" onclick="showPage('servicemode')">🔑 Service Mode</button>
+            <button class="nav-btn" onclick="showPage('printquality')">🖼️ Print Quality</button>
+            <button class="nav-btn" onclick="showPage('settings')">⚙️ Settings</button>
+        </div>
+    </nav>
+
+    <!-- Safety Banner -->
+    <div style="max-width:1200px; margin:15px auto; padding:0 20px;">
+        <div class="safety-warning">
+            ⚠️ <strong>WARNING:</strong> Printer/copier servicing involves high voltage, high temperatures, moving machinery, and laser/imaging systems. Only trained personnel should perform service procedures. Always follow the manufacturer's official safety procedures and current service documentation. Never bypass safety interlocks.
+        </div>
+    </div>
+
+    <!-- ==============================================
+         CONTENT PAGES
+         ============================================== -->
+    <div class="content-container">
+
+        <!-- DASHBOARD PAGE -->
+        <div id="page-dashboard" class="page active">
+            <h2>📊 TECHNICIAN COMMAND CENTRE</h2>
+            
+            <div class="quick-lookup">
+                <h3>⚡ Quick Error Lookup</h3>
+                <p style="color:var(--text-secondary); margin:10px 0;">Click any code to view details — database being populated with verified codes.</p>
+                <div id="quick-codes">
+                    <span class="code-tag" onclick="lookupError('C0202')">C0202</span>
+                    <span class="code-tag" onclick="lookupError('C0204')">C0204</span>
+                    <span class="code-tag" onclick="lookupError('C0500')">C0500</span>
+                    <span class="code-tag" onclick="lookupError('C0601')">C0601</span>
+                    <span class="code-tag" onclick="lookupError('C2201')">C2201</span>
+                    <span class="code-tag" onclick="lookupError('C3401')">C3401</span>
+                    <span class="code-tag" onclick="lookupError('C2550')">C2550</span>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="dashboard-card" onclick="showPage('models')">
+                    <h3>🖨️ Models</h3>
+                    <p>Machine families, specs & compatible parts</p>
+                </div>
+                <div class="dashboard-card" onclick="showPage('errors')">
+                    <h3>⚠️ Error Codes</h3>
+                    <p>Complete diagnostic & repair database</p>
+                </div>
+                <div class="dashboard-card" onclick="showPage('parts')">
+                    <h3>🔧 Parts Finder</h3>
+                    <p>Part numbers, descriptions & cross-reference</p>
+                </div>
+                <div class="dashboard-card" onclick="showPage('troubleshooting')">
+                    <h3>🔍 Troubleshooting</h3>
+                    <p>Step-by-step diagnostic workflow</p>
+                </div>
+                <div class="dashboard-card" onclick="showPage('maintenance')">
+                    <h3>🧰 Maintenance</h3>
+                    <p>PM schedules, cleaning & replacement</p>
+                </div>
+                <div class="dashboard-card" onclick="showPage('servicemode')">
+                    <h3>🔑 Service Mode</h3>
+                    <p>Access codes, functions & reset procedures</p>
+                </div>
+            </div>
+
+            <div style="margin-top:25px;">
+                <h3>🕐 Recently Viewed</h3>
+                <p style="color:var(--text-secondary); font-size:14px; margin-top:8px;" id="recent-list">No items yet — start searching to build history.</p>
+            </div>
+
+            <div style="margin-top:25px;">
+                <h3>⭐ Bookmarked</h3>
+                <p style="color:var(--text-secondary); font-size:14px; margin-top:8px;" id="bookmark-list">No bookmarks yet — click ⭐ on any error to save.</p>
+            </div>
+        </div>
+
+        <!-- MODELS PAGE -->
+        <div id="page-models" class="page">
+            <h2>🖨️ Model Database</h2>
+            <p style="color:var(--text-secondary); margin:10px 0;">Browse by machine family. <span class="verification-note" style="display:inline-block;">VERIFY WITH CURRENT KONICA MINOLTA SERVICE DOCUMENTATION — specifications subject to revision.</span></p>
+            
+            <input type="text" placeholder="Search by model name..." oninput="filterModels(this.value)">
+            
+            <div id="models-list">
+                <div class="data-card">
+                    <h3>bizhub i-Series</h3>
+                    <p>Modern generation multifunction devices — <strong>Year/Period:</strong> Verify with official documentation</p>
+                    <p><strong>Includes (verify):</strong> bizhub 227, 287, 367, 458, 558, C227, C287, C368, C458, C558, C658</p>
+                    <p><strong>Type:</strong> B&W & Colour MFP — Speed varies by model</p>
+                    <button class="btn-secondary small" onclick="viewFamily('i-series')">View Related Codes & Parts</button>
+                </div>
+                <div class="data-card">
+                    <h3>bizhub C-Series (Colour)</h3>
+                    <p>Mid-range colour MFPs — <strong>Year/Period:</strong> Verify with official documentation</p>
+                    <p><strong>Includes (verify):</strong> C220, C280, C360, C452, C552, C652, C754, C654</p>
+                    <p><strong>Type:</strong> Colour MFP — Speed: 22–75 ppm depending on model</p>
+                    <button class="btn-secondary small" onclick="viewFamily('c-series')">View Related Codes & Parts</button>
+                </div>
+                <div class="data-card">
+                    <h3>bizhub B&W Series</h3>
+                    <p>Monochrome production & office — <strong>Year/Period:</strong> Verify with official documentation</p>
+                    <p><strong>Includes (verify):</strong> 223, 283, 363, 423, 501, 601, 751</p>
+                    <p><strong>Type:</strong> Monochrome MFP — Speed: 22–75 ppm</p>
+                    <button class="btn-secondary small" onclick="viewFamily('bw-series')">View Related Codes & Parts</button>
+                </div>
+                <div class="data-card">
+                    <h3>AccurioPress / AccurioPrint (Production)</h3>
+                    <p>High-volume production systems — <strong>Year/Period:</strong> Verify with official documentation</p>
+                    <p><strong>Includes (verify):</strong> C3070, C3080, C6100, C7090, PRESS C1070, C1085</p>
+                    <p><strong>Type:</strong> Production Colour — Speed: 70–105 ppm+</p>
+                    <button class="btn-secondary small" onclick="viewFamily('accurio')">View Related Codes & Parts</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ERROR CODES PAGE -->
+        <div id="page-errors" class="page">
+            <h2>⚠️ Error Code Database</h2>
+            <p style="color:var(--text-secondary); margin:10px 0;">Search by code (with or without hyphen: C0202 or C-0202). <span class="verification-note" style="display:inline-block;">Codes are based on known service documentation. VERIFY with current service manual for your specific machine.</span></p>
+            
+            <input type="text" id="error-search" placeholder="e.g. C0202, C3401, C2550..." oninput="filterErrors(this.value)">
+            
+            <div id="errors-list">
+                <!-- Error C0202 -->
+                <div class="data-card error-item" data-code="C0202 C-0202">
+                    <h3 class="error-code-display">C0202 — Tray 1 Lift-Up Failure</h3>
+                    <p><strong>Error Type:</strong> Paper Feed / Tray Mechanism</p>
+                    <p><strong>Severity:</strong> ⚠️ Medium — Prevents feeding from Tray 1</p>
+                    <p><strong>Condition:</strong> Tray lift motor does not reach upper limit position within specified time after tray insertion.</p>
+                    <p><strong>Symptoms:</strong> Tray 1 cannot be used; machine indicates paper jam or tray error; display shows code at power-up or tray insertion.</p>
+                    <p><strong>Likely Causes:</strong> Obstruction in tray path; paper loaded incorrectly; lift motor failure; lift sensor failure; mechanical bind in lift wire/gears; connector harness loose; wrong paper size setting.</p>
+                    
+                    <div class="workflow-steps">
+                        <span class="step-badge">1. Identify Model</span>
+                        <span class="step-badge">2. Confirm Code</span>
+                        <span class="step-badge">3. Check Tray Load</span>
+                        <span class="step-badge">4. Inspect Mechanism</span>
+                        <span class="step-badge">5. Check Sensors/Motor</span>
+                        <span class="step-badge">6. Clear Error</span>
+                        <span class="step-badge">7. Test Run</span>
+                    </div>
+                    
+                    <p><strong>Recommended Repair:</strong><br>
+                    1. Pull Tray 1 fully out → check for obstructions<br>
+                    2. Verify paper size setting matches loaded paper<br>
+                    3. Check paper stack height and loading alignment<br>
+                    4. Inspect lift wire, gears, and drive mechanism<br>
+                    5. Check tray lift motor connector and operation<br>
+                    6. Check upper limit sensor flag and wiring<br>
+                    7. Reinstall tray → Clear error in Service Mode<br>
+                    8. If error returns → Replace lift motor or sensor assembly</p>
+                    
+                    <p><strong>Reset Procedure:</strong> Service Mode → Utility/Counter → Stop → 00 → Stop → 01 → System 2 → Error History → Select Code → Clear<br>
+                    <strong>Post-Repair Test:</strong> Load Tray 1 → Print 5–10 copies from Tray 1 → Monitor for repeat error<br>
+                    <strong>If Error Returns:</strong> Check harness continuity between tray unit and main board; replace tray lift motor; replace paper feed board.</p>
+                    
+                    <p><strong>Source:</strong> Based on known bizhub 223/283/363/423 service documentation<br>
+                    <strong>Last Verified:</strong> Database build — <span class="verification-note">VERIFY WITH CURRENT SERVICE MANUAL FOR YOUR EXACT MODEL</span></p>
+                    
+                    <button class="btn-secondary small" onclick="bookmarkItem('error','C0202')">⭐ Bookmark</button>
+                    <button class="btn-secondary small" onclick="printThisSection()">🖨️ Print Report</button>
+                </div>
+
+                <!-- Error C0601 - Fuser Temperature -->
+                <div class="data-card error-item" data-code="C0601 C-0601">
+                    <h3 class="error-code-display">C0601 — Fuser Temperature Abnormal / Warm-Up Failure</h3>
+                    <p><strong>Error Type:</strong> Fuser / Thermal System — <span style="color:var(--danger); font-weight:bold;">CRITICAL</span></p>
+                    <p><strong>Severity:</strong> 🔴 High — Machine will not run; fire risk if repeatedly reset without repair</p>
+                    <p><strong>Condition:</strong> Fusing unit does not reach operating temperature within specified time during warm-up or operation.</p>
+                    <p><strong>Symptoms:</strong> Machine powers up but never reaches "Ready"; error appears immediately or during warm-up cycle; fuser lamp may not illuminate.</p>
+                    <p><strong>Likely Causes:</strong> Fuser unit not fully seated; thermistor dirty, displaced, or failed; thermofuse open; heater lamp/element burnout; power supply to fuser interrupted; loose connector; low mains voltage.</p>
+                    
+                    <div class="safety-warning" style="margin:10px 0;">
+                        ⚠️ <strong>CAUTION:</strong> Fuser unit operates at high temperatures (160–200°C+). Allow 10–15 minutes to cool before servicing. Do NOT repeatedly reset this code without addressing the root cause — fire hazard exists.
+                    </div>
+                    
+                    <p><strong>Recommended Repair:</strong><br>
+                    1. Power OFF main switch → Wait 15+ minutes to cool<br>
+                    2. Remove and reinstall fuser unit — ensure locked firmly<br>
+                    3. Check fuser power connector — reseat completely<br>
+                    4. Inspect thermistor contact against heating roller — clean if toner dust covered<br>
+                    5. Check thermofuse continuity (multimeter required)<br>
+                    6. Check heater lamp/element continuity<br>
+                    7. Check mains voltage and power source stability<br>
+                    8. Clear error in Service Mode → Power cycle<br>
+                    9. If returns → Replace failed component or entire fuser unit</p>
+                    
+                    <p><strong>Reset Procedure:</strong> Service Mode → System 2 → Error History → Clear selected code<br>
+                    <strong>Post-Repair Test:</strong> Power ON → Monitor warm-up → Print 10 full-page solid density test prints → Check fusing quality → Monitor temperature reading in Service Mode → System 1 → Input Check → Thermistor reading<br>
+                    <strong>If Error Returns:</strong> ⚠️ Do NOT keep resetting. Replace fuser unit or consult certified technician. Risk of overheating and fire.</p>
+                    
+                    <p><strong>Related Codes:</strong> C0602 (Overheat), C0603, C0610<br>
+                    <strong>Source:</strong> Based on standard bizhub service documentation<br>
+                    <strong>Last Verified:</strong> Database build — <span class="verification-note">VERIFY WITH CURRENT SERVICE MANUAL FOR YOUR EXACT MODEL</span></p>
+                    
+                    <button class="btn-secondary small" onclick="bookmarkItem('error','C0601')">⭐ Bookmark</button>
+                    <button class="btn-secondary small" onclick="printThisSection()">🖨️ Print Report</button>
+                </div>
+
+                <!-- Error C2550 - Developer Density -->
+                <div class="data-card error-item" data-code="C2550 C-2550">
+                    <h3 class="error-code-display">C2550 — Black Developer Density Sensor Error</h3>
+                    <p><strong>Error Type:</strong> Imaging / Developer Unit</p>
+                    <p><strong>Severity:</strong> ⚠️ Medium — Poor print quality or black colour missing</p>
+                    <p><strong>Condition:</strong> Toner density sensor (ID sensor) detects abnormal developer-to-toner ratio outside acceptable range.</p>
+                    <p><strong>Symptoms:</strong> Prints too light or too dark; black missing; error appears after toner refill or developer change; image quality gradually degrades.</p>
+                    <p><strong>Likely Causes:</strong> ID sensor dirty; developer unit nearing end-of-life; incorrect toner concentration; faulty toner supply; developer unit not seated properly; sensor connector loose; wrong type of developer installed.</p>
+                    
+                    <p><strong>Recommended Repair:</strong><br>
+                    1. Enter Service Mode → Check developer counter — replace if expired<br>
+                    2. Remove Black Developer Unit — handle carefully, do not spill developer<br>
+                    3. Clean ID sensor surface with dry lint-free cloth — NO liquid<br>
+                    4. Check developer material level and condition<br>
+                    5. Inspect developer unit drive coupling and gear<br>
+                    6. Reinstall developer unit firmly<br>
+                    7. Run Auto Toner Density Adjustment in Service Mode<br>
+                    8. Print test page → Check density<br>
+                    9. If persistent → Replace developer unit and run calibration</p>
+                    
+                    <p><strong>Reset/Calibration:</strong> Service Mode → Image Adjustment → Auto Density Adjustment → Execute<br>
+                    <strong>Post-Repair Test:</strong> Print density test pattern → Compare to reference → Run 50 copies → Check stability<br>
+                    <strong>If Error Returns:</strong> Replace developer unit; check toner supply motor; check toner hopper bridge/blockage; replace ID sensor.</p>
+                    
+                    <p><strong>Related Codes:</strong> C2551 (Cyan), C2552 (Magenta), C2553 (Yellow)<br>
+                    <strong>Source:</strong> Based on standard bizhub colour MFP service documentation<br>
+                    <strong>Last Verified:</strong> Database build — <span class="verification-note">VERIFY WITH CURRENT SERVICE MANUAL FOR YOUR EXACT MODEL</span></p>
+                    
+                    <button class="btn-secondary small" onclick="bookmarkItem('error','C2550')">⭐ Bookmark</button>
+                    <button class="btn-secondary small" onclick="printThisSection()">🖨️ Print Report</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- JAM CODES PAGE -->
+        <div id="page-jams" class="page">
+            <h2>📄 Jam Codes & Paper Path</h2>
+            <p style="color:var(--text-secondary); margin:10px 0;">Location-based jam troubleshooting. <span class="verification-note" style="display:inline-block;">VERIFY jam codes and sensor locations with your specific model service manual.</span></p>
+            
+            <div class="data-card">
+                <h3>General Jam Clearing Procedure</h3>
+                <div class="workflow-steps">
+                    <span class="step-badge">1. Locate Indicator</span>
+                    <span class="step-badge">2. Open Correct Door</span>
+                    <span class="step-badge">3. Remove Paper GENTLY</span>
+                    <span class="step-badge">4. Check for Scraps</span>
+                    <span class="step-badge">5. Inspect Sensors</span>
+                    <span class="step-badge">6. Check Rollers</span>
+                    <span class="step-badge">7. Verify Paper Size</span>
+                    <span class="step-badge">8. Close & Test</span>
+                </div>
+                <p style="margin-top:15px;"><strong>Key Rule:</strong> Pull paper in the direction of paper travel. Pulling backward can damage sensors, belts, or leave torn paper fragments behind causing repeat jams.</p>
+                <p><strong>Repeat Jam Same Location:</strong> Clean feed/separation rollers → Check paper path sensor flag → Check drive gear → Check paper size setting → Try fresh paper → Check fuser exit guide.</p>
+            </div>
+            
+            <div class="data-card">
+                <h3>Common Jam Locations (General Reference)</h3>
+                <p><strong>Tray Feed Area:</strong> Check feed roller, separation pad, paper size sensor, lift mechanism</p>
+                <p><strong>Transport / Vertical Path:</strong> Check guide plates, registration roller timing, paper dust buildup on sensors</p>
+                <p><strong>Drum / Transfer Area:</strong> ⚠️ Remove paper carefully — do NOT scratch drum surface. Check transfer belt/roller separation claw</p>
+                <p><strong>Fuser / Exit Area:</strong> ⚠️ HOT — Let cool first. Check exit sensor flag, separation fingers, fuser roller condition, oil coating (if applicable)</p>
+                <p><strong>Finisher / Output Tray:</strong> Check exit gate, staple unit obstruction, shift tray alignment, stacker motor operation</p>
+                <p class="verification-note">Specific jam codes and sensor positions vary by model family. ALWAYS verify with your machine's service manual and on-screen jam indicator.</p>
+            </div>
+        </div>
+
+        <!-- PARTS FINDER PAGE -->
+        <div id="page-parts" class="page">
+            <h2>🔧 Parts Finder & Cross-Reference</h2>
+            <p style="color:var(--text-secondary); margin:10px 0;">Search by part number, description, or related error code. <span class="verification-note" style="display:inline-block;">PART NUMBERS LISTED ARE FOR REFERENCE ONLY — VERIFY with official Konica Minolta Parts Catalogue before ordering.</span></p>
+            
+            <input type="text" placeholder="Search part number or description..." oninput="filterParts(this.value)">
+            
+            <div class="data-card">
+                <h3>Developer Unit — Black (Example Reference)</h3>
+                <p><strong>Common Base Part #:</strong> <span class="verification-note">PART NUMBER REQUIRES VERIFICATION by exact model</span></p>
+                <p><strong>Description:</strong> Black imaging developer unit — contains carrier/developer powder, development roller, density sensor</p>
+                <p><strong>Used On (verify):</strong> bizhub C220/C280/C360, C454/C554 and similar colour machines — confirm exact model compatibility</p>
+                <p><strong>Related Error Codes:</strong> C2550, C2551, C2552, C2553, C2201 series toner supply errors</p>
+                <p><strong>Common Failure Symptoms:</strong> Light print, poor density, developer spillage, error code at power-up, copy count reaches end-of-life</p>
+                <p><strong>Replacement Notes:</strong> Developer must be replaced with fresh developer powder — do NOT reuse old developer. Run Auto Toner Density Calibration after replacement. Reset developer counter in Service Mode.</p>
+                <p><strong>Source:</strong> General parts reference — <span class="verification-note">VERIFY with official Konica Minolta Parts Catalogue for your exact machine model</span></p>
+            </div>
+            
+            <div class="data-card">
+                <h3>Fuser Unit / Fusing Assembly (Example Reference)</h3>
+                <p><strong>Common Base Part #:</strong> <span class="verification-note">PART NUMBER REQUIRES VERIFICATION by exact model</span></p>
+                <p><strong>Description:</strong> Complete fusing unit — heating roller, pressure roller, heater element, thermistor, thermofuse, exit separation fingers</p>
+                <p><strong>Used On (verify):</strong> bizhub 223/283/363/423, C220/C280/C360, C454/C554 — different ratings for 110V vs 220V mains ⚠️ CRITICAL</p>
+                <p><strong>Related Error Codes:</strong> C0601, C0602, C0603, C0610 series fuser errors</p>
+                <p><strong>Common Failure Symptoms:</strong> Toner not fusing to paper, paper wrap-around on fuser roller, warm-up failure, error code, abnormal noise, overheat warning</p>
+                <p><strong>Replacement Notes:</strong> ⚠️ Verify VOLTAGE rating (110V vs 220V) — wrong voltage = fire risk. Allow unit to cool completely before removal. Reset fuser counter in Service Mode after replacement.</p>
+                <p><strong>Source:</strong> General parts reference — <span class="verification-note">VERIFY with official Konica Minolta Parts Catalogue for your exact machine model AND voltage configuration</span></p>
+            </div>
+        </div>
+
+        <!-- TROUBLESHOOTING PAGE -->
+        <div id="page-troubleshooting" class="page">
+            <h2>🔍 Step-by-Step Diagnostic Workflow</h2>
+            
+            <div class="data-card">
+                <h3>Standard Service Procedure — Full Workflow</h3>
+                <div class="workflow-steps" style="font-size:15px; padding:15px; line-height:2;">
+                    <span class="step-badge">1️⃣ IDENTIFY — Confirm exact machine model & serial number</span><br>
+                    <span class="step-badge">2️⃣ ERROR — Record full error code, sub-code, and when it occurs</span><br>
+                    <span class="step-badge">3️⃣ SYMPTOM — Does it happen on copy? print? scan? fax? warm-up? specific tray?</span><br>
+                    <span class="step-badge">4️⃣ OBVIOUS — Check paper, toner, doors, trays, power, environment</span><br>
+                    <span class="step-badge">5️⃣ POWER CYCLE — OFF → Wait 60 sec → ON → Does error return?</span><br>
+                    <span class="step-badge">6️⃣ CONNECTORS — Reseat harnesses, boards, units (power OFF first)</span><br>
+                    <span class="step-badge">7️⃣ SENSORS — Clean, check flags, check wiring, check voltage</span><br>
+                    <span class="step-badge">8️⃣ MOTORS — Listen for operation, check drive gears, check lock signals</span><br>
+                    <span class="step-badge">9️⃣ DIAG MODE — Run Service Mode input/output checks, component tests</span><br>
+                    <span class="step-badge">🔟 COMPONENT — Replace confirmed failed part with verified compatible part</span><br>
+                    <span class="step-badge">1️⃣1️⃣ RESET — Clear error history & reset counters as required</span><br>
+                    <span class="step-badge">1️⃣2️⃣ VERIFY — Run multiple test modes, full function check, quality inspection</span><br>
+                    <span class="step-badge">1️⃣3️⃣ DOCUMENT — Record meter reading, work performed, parts used, result</span>
+                </div>
+            </div>
+            
+            <div class="data-card">
+                <h3>Decision Guide — When to Replace vs Repair</h3>
+                <p><strong>Replace:</strong> Developer unit, drum unit, fuser unit, transfer belt, feed rollers — these are consumable items with fixed life counters</p>
+                <p><strong>Repair/Service:</strong> Sensors, connectors, gears, belts, lamps, fans — these are serviceable components unless physically destroyed</p>
+                <p><strong>Note:</strong> Always check counter readings in Service Mode before replacing expensive units. A 95% life remaining developer unit with a density error usually only needs cleaning and calibration — not replacement.</p>
+            </div>
+        </div>
+
+        <!-- MAINTENANCE PAGE -->
+        <div id="page-maintenance" class="page">
+            <h2>🧰 Maintenance & PM Procedures</h2>
+            
+            <div class="data-card">
+                <h3>Preventive Maintenance Schedule (General Guideline)</h3>
+                <p><strong>Every 50K copies / Monthly:</strong> Clean feed rollers, separation pads, paper path sensors, corona wire/grid, scanner glass, white reference plate</p>
+                <p><strong>Every 100K copies:</strong> Replace feed rollers & separation pads, clean fuser inlet/outlet guides, check developer unit counters, inspect transfer belt/roller</p>
+                <p><strong>Every 200K copies:</strong> Replace transfer belt/roller assembly if required, fuser unit inspection/replacement, lubricate scanner rails, check all drive belts & gears</p>
+                <p><strong>Every 500K copies:</strong> Full PM kit replacement — developer, drum, fuser, transfer, rollers, belts, filters, fans</p>
+                <p class="verification-note">Actual PM intervals vary significantly by model, volume, and environment. ALWAYS refer to your specific machine service manual for exact counter-based replacement schedules.</p>
+            </div>
+            
+            <div class="data-card">
+                <h3>Consumables Reference — Typical Life Expectancy</h3>
+                <p><strong>Toner Bottle:</strong> 20K–25K pages (approximate — coverage dependent)</p>
+                <p><strong>Waste Toner Bottle:</strong> Fills after approx 3–4 toner bottle changes</p>
+                <p><strong>Drum Unit:</strong> 100K–200K copies (model dependent)</p>
+                <p><strong>Developer Unit:</strong> Same life cycle as drum unit on most models</p>
+                <p><strong>Fuser Unit:</strong> 150K–300K copies (model dependent)</p>
+                <p><strong>Feed Roller Set:</strong> 100K–150K copies or when jamming becomes frequent</p>
+                <p class="verification-note">Page yields based on 5% coverage A4/Letter. Actual life varies by usage, environment, paper quality, and coverage. VERIFY with manufacturer specs for your exact model.</p>
+            </div>
+        </div>
+
+        <!-- SERVICE MODE PAGE -->
+        <div id="page-servicemode" class="page">
+            <h2>🔑 Service Mode Reference</h2>
+            
+            <div class="safety-warning">
+                ⚠️ <strong>WARNING:</strong> Service Mode allows changing critical machine operating parameters. Incorrect settings can cause poor quality, component damage, or unsafe operating conditions. Only enter Service Mode for legitimate service tasks. Record original values before making any changes.
+            </div>
+            
+            <div class="data-card">
+                <h3>Access Procedure — bizhub & Accurio Series (General)</h3>
+                <p><strong>Step 1:</strong> Press <strong>Utility / Counter</strong> button on main panel</p>
+                <p><strong>Step 2:</strong> Press sequence: <strong>Stop → 0 → 0 → Stop → 0 → 1</strong></p>
+                <p><strong>Step 3:</strong> If password prompt appears — default is usually <strong>00000000</strong> or <strong>12345678</strong></p>
+                <p><strong>Step 4:</strong> Machine enters Service Mode — screen changes to show system menus</p>
+                <p class="verification-note">This access sequence applies to many bizhub models but is NOT universal. Some production machines use different procedures. VERIFY access method with your specific model service manual.</p>
+            </div>
+            
+            <div class="data-card">
+                <h3>Common Service Mode Functions (General Reference)</h3>
+                <p><strong>System 1:</strong> Input check (sensor readings, thermistor temp, voltage levels), Output check (component test mode), Counter display, Firmware version</p>
+                <p><strong>System 2:</strong> Error history, Error clear, Machine settings, Region/Date/Time, Network config</p>
+                <p><strong>Image Adjustment:</strong> Auto density calibration, Colour registration, Gradation/gamma adjustment, Scanner calibration, Printer gamma</p>
+                <p><strong>Counter / Life:</strong> Consumable counters reset, PM counter, Meter reading display</p>
+                <p class="verification-note">Menu structure and function codes vary by model family and firmware version. VERIFY menu path before making changes.</p>
+            </div>
+        </div>
+
+        <!-- PRINT QUALITY PAGE -->
+        <div id="page-printquality" class="page">
+            <h2>🖼️ Print Quality Troubleshooting</h2>
+            
+            <div class="data-card">
+                <h3>Visual Symptom Guide</h3>
+                <p><strong>🔍 Light Print / Faded:</strong> Toner low → Density setting too low → Developer unit nearing end → ID sensor dirty → Laser window dusty → Transfer roller/belt worn → Paper damp → Wrong paper type</p>
+                <p><strong>🔍 Dark Print / Background Toner:</strong> Developer contaminated → Toner cartridge leaking → Laser diode not turning off → Corona charge unit dirty → High voltage power supply issue → Wrong toner type → Density setting maxed</p>
+                <p><strong>🔍 Vertical Lines / Streaks:</strong> Drum surface scratched → Cleaning blade damaged → Fuser roller mark → Developer unit streak → Laser scanner glass dusty → Corona wire dirty → Transfer belt scratch → Exit guide contamination</p>
+                <p><strong>🔍 Repeating Marks (Equal Spacing):</strong> Measure distance between repeats → Matches circumference of: Drum (~94mm), Developer roller, Fuser roller (~80mm), Pressure roller, Transfer belt → Replace or clean corresponding component</p>
+                <p><strong>🔍 Ghosting / Image Offset:</strong> Fuser not heating enough → Pressure roller worn → Drum cleaning failure → Transfer belt charge decay → Toner melting point mismatch → Low mains voltage → Fuser counter expired</p>
+                <p><strong>🔍 Toner Not Fusing / Rubs Off:</strong> Fuser temperature setting too low → Thermistor displaced → Fuser lamp/element weak → Wrong paper weight setting → Damp paper → Fuser unit nearing end-of-life → Low voltage supply</p>
+                <p class="verification-note">Symptom causes may vary by model and configuration. Always perform test prints on standard plain paper first to eliminate environmental factors.</p>
+            </div>
+        </div>
+
+        <!-- TECHNICIAN NOTES PAGE -->
+        <div id="page-notes" class="page">
+            <h2>📝 Technician Work Log & Notes</h2>
+            <p style="color:var(--text-secondary); margin:10px 0;">Saved locally in your browser — data persists between sessions.</p>
+            
+            <div class="data-card">
+                <h3>New Service Record</h3>
+                <input type="text" id="note-customer" placeholder="Customer / Company Name">
+                <input type="text" id="note-machine" placeholder="Machine Model + Serial">
+                <input type="text" id="note-error" placeholder="Error Code / Symptom">
+                <input type="date" id="note-date">
+                <textarea id="note-problem" placeholder="Problem Description..." rows="3"></textarea>
+                <textarea id="note-work" placeholder="Work Performed, Steps Taken..." rows="3"></textarea>
+                <textarea id="note-parts" placeholder="Parts Used + Part Numbers..." rows="2"></textarea>
+                <input type="text" id="note-meter" placeholder="Meter Reading at Service">
+                <textarea id="note-result" placeholder="Result / Outcome / Follow-Up..." rows="2"></textarea>
+                <button class="btn-green small" onclick="saveNote()">💾 Save Service Record</button>
+            </div>
+            
+            <div id="notes-list">
+                <h3 style="margin-top:30px;">📋 Saved Records</h3>
+                <p id="no-notes" style="color:var(--text-secondary);">No saved records yet. Fill form above and click Save.</p>
+                <!-- Notes will load here via JavaScript -->
+            </div>
+        </div>
+
+        <!-- BOOKMARKS PAGE -->
+        <div id="page-bookmarks" class="page">
+            <h2>⭐ Bookmarked Items</h2>
+            <p style="color:var(--text-secondary); margin:10px 0;">Quick access to frequently referenced codes and parts.</p>
+            <div id="bookmarks-list-display">
+                <p style="color:var(--text-secondary);">No bookmarks yet. Click ⭐ on any error code or part to save.</p>
+            </div>
+        </div>
+
+        <!-- SETTINGS PAGE -->
+        <div id="page-settings" class="page">
+            <h2>⚙️ Settings & Info</h2>
+            <div class="data-card">
+                <h3>Application Info</h3>
+                <p><strong>Version:</strong> 1.0</p>
+                <p><strong>Database Status:</strong> Demo — example records included</p>
+                <p><strong>Works Offline:</strong> Yes — save page to your device after first load</p>
+                <p><strong>Data Storage:</strong> Notes & Bookmarks saved locally in browser — never sent to server</p>
+                <p style="margin-top:15px;" class="verification-note">Always verify all service procedures, error codes, part numbers, and reset procedures with the official Konica Minolta Service Manual and Parts Catalogue specific to your exact machine model and firmware version.</p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+        <p>Konica Minolta Technician Pro v1.0 — Independent Reference Tool<br>
+        Not affiliated with
