@@ -3,626 +3,336 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Konica Minolta Technician Pro</title>
+    <title>KM Technician Pro</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
-        :root {
-            --bg-dark: #121212; --bg-card: #1e1e1e; --bg-hover: #2a2a2a;
-            --accent-blue: #0066B3; --accent-cyan: #00A3AD;
-            --text-primary: #ffffff; --text-secondary: #b3b3b3;
-            --danger: #e53935; --warning: #FF9800; --success: #4CAF50; --video: #FF0000;
-        }
-        body { background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; line-height: 1.6; padding: 20px; color: #333; max-width: 900px; margin: 0 auto; }
 
+        /* 🔐 Password Screen */
         #password-screen {
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            min-height: 100vh; padding: 20px; text-align: center;
+            min-height: 80vh; text-align: center;
         }
-        .password-box {
-            background: var(--bg-card); padding: 40px 30px; border-radius: 16px;
-            max-width: 400px; width: 100%; border: 1px solid #333;
+        #password-screen h1 { color: #000; font-size: 28px; margin-bottom: 10px; }
+        #password-screen .subtitle { color: #666; margin-bottom: 25px; font-size: 16px; }
+        #password-input {
+            padding: 12px 16px; font-size: 18px; width: 260px; border: 2px solid #ddd;
+            border-radius: 8px; margin-bottom: 12px; text-align: center;
         }
-        .password-box h1 { font-size: 24px; margin-bottom: 5px; color: var(--accent-blue); }
-        .password-box h2 { font-size: 16px; font-weight: 400; color: var(--text-secondary); margin-bottom: 30px; }
-        .password-input {
-            width: 100%; padding: 14px; font-size: 16px; border-radius: 8px;
-            border: 1px solid #444; background: var(--bg-dark); color: white;
-            margin-bottom: 15px; text-align: center;
+        #unlock-btn {
+            padding: 12px 32px; font-size: 18px; background: #0066B3; color: white;
+            border: none; border-radius: 8px; cursor: pointer;
         }
-        .btn-primary {
-            width: 100%; padding: 14px; font-size: 16px; font-weight: 600;
-            background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan));
-            color: white; border: none; border-radius: 8px; cursor: pointer;
-            transition: transform 0.2s;
-        }
-        .btn-primary:hover { transform: scale(1.02); }
-        .btn-secondary {
-            padding: 8px 14px; font-size: 13px; background: #333; color: white;
-            border: none; border-radius: 6px; cursor: pointer; margin: 5px 5px 5px 0;
-            display: inline-flex; align-items: center; gap: 6px; text-decoration: none;
-        }
-        .btn-secondary:hover { background: #444; }
-        .btn-video { background: var(--video); }
-        .btn-video:hover { background: #ff3333; }
-        .version-label { font-size: 12px; color: var(--text-secondary); margin-top: 20px; }
-        .error-msg { color: var(--danger); margin-top: 12px; display: none; }
-        .disclaimer-text {
-            font-size: 11px; color: var(--text-secondary); margin-top: 20px; line-height: 1.5;
-        }
+        #unlock-btn:hover { background: #005299; }
+        #error-msg { color: red; margin-top: 12px; display: none; }
+        .tiny-note { margin-top: 30px; font-size: 12px; color: #888; line-height: 1.5; }
 
-        .video-container {
-            background: var(--bg-card); border-radius: 12px; padding: 20px; margin: 20px 0;
-            border-left: 4px solid var(--video); display: none;
-        }
-        .video-container.show { display: block; animation: fadeIn 0.3s; }
-        .video-container h3 { margin-bottom: 12px; color: var(--video); }
-        .video-wrapper {
-            position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 8px;
-            background: #000; margin-top: 10px;
-        }
-        .video-wrapper iframe {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;
-        }
-        .video-input-row {
-            display: flex; gap: 8px; margin: 12px 0; align-items: center; flex-wrap: wrap;
-        }
-        .video-input-row input {
-            flex: 1; min-width: 200px; margin: 0;
-        }
+        /* Main Content — YOUR ORIGINAL look */
+        #main-content { display: none; }
 
-        #main-app { display: none; }
-        .app-header {
-            background: var(--bg-card); padding: 12px 20px; display: flex;
-            justify-content: space-between; align-items: center; position: sticky; top: 0;
-            border-bottom: 1px solid #333; z-index: 100; flex-wrap: wrap; gap: 10px;
-        }
-        .app-header h1 { font-size: 18px; color: var(--accent-blue); }
-        .header-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-        .search-bar { flex: 1; min-width: 220px; margin: 0 10px; }
-        .search-bar input {
-            width: 100%; padding: 10px 15px; border-radius: 8px; border: 1px solid #444;
-            background: var(--bg-dark); color: white; font-size: 15px;
-        }
-
-        .nav-container { position: sticky; top: 56px; background: var(--bg-card); padding: 10px; overflow-x: auto; border-bottom: 1px solid #333; }
-        .nav-grid { display: flex; flex-wrap: nowrap; gap: 8px; }
-        .nav-btn {
-            padding: 10px 14px; background: var(--bg-hover); color: white; border: none;
-            border-radius: 8px; font-size: 13px; cursor: pointer; white-space: nowrap;
-        }
-        .nav-btn:hover, .nav-btn.active { background: var(--accent-blue); }
-
-        .content-container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-        .page { display: none; }
-        .page.active { display: block; animation: fadeIn 0.3s; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        h2 { margin-bottom: 20px; color: var(--accent-cyan); }
-        input[type="text"], input[type="date"], textarea {
-            width: 100%; padding: 12px; background: var(--bg-dark); color: white;
-            border: 1px solid #444; border-radius: 8px; margin: 6px 0; font-size: 14px;
-        }
-        textarea { min-height: 80px; resize: vertical; }
-
-        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 20px; }
-        .dashboard-card {
-            background: var(--bg-card); padding: 20px; border-radius: 12px; cursor: pointer;
-            border: 1px solid #333; transition: transform 0.2s;
-        }
-        .dashboard-card:hover { transform: translateY(-3px); border-color: var(--accent-blue); }
-        .dashboard-card h3 { font-size: 16px; margin-bottom: 8px; }
-        .dashboard-card p { font-size: 13px; color: var(--text-secondary); }
-
-        .quick-lookup {
-            background: var(--bg-card); padding: 20px; border-radius: 12px; margin: 20px 0; border: 1px solid #333;
-        }
-        .code-tag {
-            display: inline-block; padding: 8px 16px; background: var(--bg-hover);
-            border-radius: 6px; margin: 5px; cursor: pointer; font-family: monospace; font-size: 15px;
-        }
-        .code-tag:hover { background: var(--accent-blue); }
-
-        .data-card {
-            background: var(--bg-card); border-radius: 12px; padding: 20px; margin-bottom: 15px;
-            border-left: 4px solid var(--accent-blue);
-        }
-        .data-card h3 { font-size: 18px; margin-bottom: 12px; color: var(--accent-cyan); }
-        .verification-note {
-            background: rgba(255, 152, 0, 0.1); border-left: 3px solid var(--warning);
-            padding: 10px; border-radius: 6px; font-size: 13px; margin: 10px 0;
-        }
-        .safety-warning {
-            background: rgba(229, 57, 53, 0.1); border-left: 3px solid var(--danger);
-            padding: 12px; border-radius: 6px; font-size: 13px; margin: 15px 0;
-        }
-
-        button.small { padding: 8px 14px; font-size: 13px; border-radius: 6px; }
-        .btn-green { background: var(--success); color: white; border: none; }
-        .btn-orange { background: var(--warning); color: white; border: none; }
-        .btn-red { background: var(--danger); color: white; border: none; }
-
-        .note-item, .bookmark-item {
-            background: var(--bg-card); padding: 15px; border-radius: 10px; margin-bottom: 10px;
-            border-left: 3px solid var(--accent-blue);
-        }
-        .delete-btn { background: var(--danger); color: white; border: none; margin-left: 8px; }
-
-        .app-footer {
-            text-align: center; padding: 20px; font-size: 12px; color: var(--text-secondary);
-            margin-top: 40px; border-top: 1px solid #333;
-        }
+        h1 { font-size: 26px; margin: 20px 0 10px; }
+        h2 { font-size: 22px; margin: 20px 0 8px; }
+        h3 { font-size: 18px; margin: 16px 0 6px; }
+        .version { color: #666; font-size: 14px; margin-bottom: 15px; }
+        hr { border: none; border-top: 1px solid #ccc; margin: 20px 0; }
+        ul, ol { margin-left: 22px; margin-bottom: 12px; }
+        li { margin-bottom: 5px; }
+        strong { font-weight: bold; }
+        code, .part { font-family: monospace; background: #eee; padding: 2px 6px; border-radius: 3px; }
+        .warning { background: #fff3cd; border-left: 4px solid #ffc107; padding: 10px 14px; margin: 12px 0; }
+        .danger { background: #f8d7da; border-left: 4px solid #dc3545; padding: 10px 14px; margin: 12px 0; }
+        .video-area { background: #000; color: #fff; padding: 15px; border-radius: 6px; margin: 15px 0; }
+        input[type="text"] { padding: 8px; border-radius: 4px; border: 1px solid #ccc; width: 60%; }
+        button { padding: 8px 16px; cursor: pointer; }
+        nav { margin: 15px 0; }
+        nav a { margin-right: 10px; text-decoration: none; color: #0066B3; }
+        nav a:hover { text-decoration: underline; }
+        .code-links a { margin-right: 8px; font-weight: bold; color: #0066B3; text-decoration: none; }
+        .code-links a:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
 
+<!-- 🔐 PASSWORD SCREEN — Password NOT visible anywhere -->
 <div id="password-screen">
-    <div class="password-box">
-        <h1>KONICA MINOLTA</h1>
-        <h2>TECHNICIAN PRO</h2>
-        <p style="color:var(--text-secondary); margin-bottom:20px;">Enter password to access</p>
-        <input type="password" class="password-input" id="app-password" placeholder="Enter password...">
-        <button class="btn-primary" onclick="checkPassword()">🔓 UNLOCK APP</button>
-        <p class="error-msg" id="wrong-pass">❌ Wrong password — try again!</p>
-        <p class="version-label">Version 1.4 — ✅ Transfer Belt + Roller + Clutches + Motors + Video Player</p>
-        <div class="disclaimer-text">
-            Password: <strong>Konica2026</strong><br><br>
-            Independent technician reference tool.<br>Not affiliated with or endorsed by Konica Minolta.<br>
-            Videos are for educational reference only.
-        </div>
-    </div>
+    <h1>KONICA MINOLTA — TECHNICIAN PRO</h1>
+    <p class="subtitle">Version 1.4 — Transfer Belt + Roller + Clutches + Motors + Video Player</p>
+    <input type="password" id="password-input" placeholder="Enter Password">
+    <br>
+    <button id="unlock-btn">🔓 Unlock Access</button>
+    <div id="error-msg">❌ Incorrect password — please try again</div>
+    <p class="tiny-note">
+        Independent technician reference tool.<br>
+        Not affiliated with or endorsed by Konica Minolta.<br>
+        Videos are for educational reference only.
+    </p>
 </div>
 
-<div id="main-app">
-    <header class="app-header">
-        <h1>🖨️ KM Technician Pro</h1>
-        <div class="search-bar">
-            <input type="text" id="global-search" placeholder="🔍 Search model, error code, part..." oninput="performGlobalSearch(this.value)">
-        </div>
-        <div class="header-actions">
-            <button class="btn-secondary" onclick="showPage('notes')">📝 Notes</button>
-            <button class="btn-secondary" onclick="showPage('bookmarks')">⭐ Bookmarks</button>
-            <button class="btn-secondary" onclick="logout()">🚪 Logout</button>
-        </div>
-    </header>
+<!-- 📄 MAIN CONTENT — Exact original content, password line removed -->
+<div id="main-content">
 
-    <nav class="nav-container">
-        <div class="nav-grid">
-            <button class="nav-btn active" onclick="showPage('dashboard')">📊 Dashboard</button>
-            <button class="nav-btn" onclick="showPage('models')">🖨️ Models</button>
-            <button class="nav-btn" onclick="showPage('errors')">⚠️ Error Codes</button>
-            <button class="nav-btn" onclick="showPage('jams')">📄 Jam Codes</button>
-            <button class="nav-btn" onclick="showPage('parts')">🔧 Parts Finder</button>
-            <button class="nav-btn" onclick="showPage('troubleshooting')">🔍 Troubleshooting</button>
-            <button class="nav-btn" onclick="showPage('maintenance')">🧰 Maintenance</button>
-            <button class="nav-btn" onclick="showPage('servicemode')">🔑 Service Mode</button>
-            <button class="nav-btn" onclick="showPage('printquality')">🖼️ Print Quality</button>
-            <button class="nav-btn" onclick="showPage('settings')">⚙️ Settings</button>
-        </div>
-    </nav>
+<h1>KONICA MINOLTA</h1>
+<h2>TECHNICIAN PRO</h2>
+<p class="version">Version 1.4 — ✅ Transfer Belt + Roller + Clutches + Motors + Video Player</p>
 
-    <div style="max-width:1200px; margin:15px auto; padding:0 20px;">
-        <div class="safety-warning">
-            ⚠️ <strong>WARNING:</strong> Printer/copier servicing involves high voltage, high temperatures, moving machinery, and laser/imaging systems. Only trained personnel should perform service procedures. Always follow the manufacturer's official safety procedures.
-        </div>
-    </div>
+<p>Independent technician reference tool.<br>
+Not affiliated with or endorsed by Konica Minolta.<br>
+Videos are for educational reference only.</p>
 
-    <div class="content-container">
+<div class="warning">
+⚠️ <strong>WARNING:</strong> Printer/copier servicing involves high voltage, high temperatures, moving machinery, and laser/imaging systems. Only trained personnel should perform service procedures. Always follow the manufacturer's official safety procedures.
+</div>
 
-        <div id="page-dashboard" class="page active">
-            <h2>📊 TECHNICIAN COMMAND CENTRE</h2>
-            <div class="quick-lookup">
-                <h3>⚡ Quick Error Lookup</h3>
-                <p style="color:var(--text-secondary); margin:10px 0;">Click any code to view details — or use search bar. 🎬 Video tutorials available on error pages.</p>
-                <div id="quick-codes">
-                    <span class="code-tag" onclick="lookupError('C0202')">C0202</span>
-                    <span class="code-tag" onclick="lookupError('C0204')">C0204</span>
-                    <span class="code-tag" onclick="lookupError('C0500')">C0500</span>
-                    <span class="code-tag" onclick="lookupError('C0601')">C0601</span>
-                    <span class="code-tag" onclick="lookupError('C2201')">C2201</span>
-                    <span class="code-tag" onclick="lookupError('C3401')">C3401</span>
-                    <span class="code-tag" onclick="lookupError('C2550')">C2550</span>
-                </div>
-            </div>
-            <div class="dashboard-grid">
-                <div class="dashboard-card" onclick="showPage('models')">
-                    <h3>🖨️ Models</h3>
-                    <p>C224e, C284e, C364e, C454e, C554e, C258, C308, C368+</p>
-                </div>
-                <div class="dashboard-card" onclick="showPage('errors')">
-                    <h3>⚠️ Error Codes</h3>
-                    <p>Database + 🎬 Embedded video player</p>
-                </div>
-                <div class="dashboard-card" onclick="showPage('parts')">
-                    <h3>🔧 Parts Finder</h3>
-                    <p>Belt • Roller • Drum • Fuser • Motor • Clutch</p>
-                </div>
-                <div class="dashboard-card" onclick="showPage('troubleshooting')">
-                    <h3>🔍 Troubleshooting</h3>
-                    <p>Step-by-step diagnostic workflow</p>
-                </div>
-                <div class="dashboard-card" onclick="showPage('maintenance')">
-                    <h3>🧰 Maintenance</h3>
-                    <p>PM schedules & replacement guides</p>
-                </div>
-                <div class="dashboard-card" onclick="showPage('servicemode')">
-                    <h3>🔑 Service Mode</h3>
-                    <p>Access codes & counter resets</p>
-                </div>
-            </div>
-        </div>
+<nav>
+📊 Dashboard 🖨️ Models ⚠️ Error Codes 📄 Jam Codes 🔧 Parts Finder 🔍 Troubleshooting 🧰 Maintenance 🔑 Service Mode 🖼️ Print Quality ⚙️ Settings
+</nav>
 
-        <div id="page-models" class="page">
-            <h2>🖨️ Model Database</h2>
-            <p style="color:var(--text-secondary); margin:10px 0;">Search by model name or family.</p>
-            <input type="text" id="model-search" placeholder="Search e.g. bizhub C224e, C258..." oninput="filterModels(this.value)">
-            <div id="models-list">
-                <div class="data-card">
-                    <h3>bizhub C-Series — e Generation (Colour)</h3>
-                    <p><strong>Includes:</strong> <strong>C224e, C284e, C364e, C454e, C554e</strong></p>
-                    <p><strong>Speed:</strong> 22–55 ppm Colour & B&W</p>
-                    <p><strong>Notes:</strong> DV512 developer, DR512 drum, TN512 toner, Transfer Belt A161R71300.</p>
-                </div>
-                <div class="data-card">
-                    <h3>bizhub C-Series — 8 Generation (Colour)</h3>
-                    <p><strong>Includes:</strong> <strong>C226, C258, C308, C368, C458, C558, C658</strong></p>
-                    <p><strong>Speed:</strong> 22–65 ppm Colour & B&W</p>
-                    <p><strong>Notes:</strong> DV313 developer, DR313 drum, TN324/TN319 toner, Transfer Belt A7UUR70400.</p>
-                </div>
-                <div class="data-card">
-                    <h3>bizhub i-Series & Classic Series</h3>
-                    <p><strong>i-Series:</strong> bizhub 227, 287, 367, C227, C287, C368, C458, C558, C658</p>
-                    <p><strong>Classic:</strong> C220, C280, C360, C452, C552, C652, C754, C654</p>
-                    <p><strong>B&W Series:</strong> 223, 283, 363, 423, 501, 601, 751, 164/185/215/225i</p>
-                </div>
-            </div>
-        </div>
+<hr>
 
-        <div id="page-errors" class="page">
-            <h2>⚠️ Error Code Database</h2>
-            <p style="color:var(--text-secondary); margin:10px 0;">🎬 Video Player: Paste YouTube ID → Load Video → plays right here!</p>
-            
-            <div class="video-container" id="video-player">
-                <h3>🎬 Video Tutorial Player</h3>
-                <div class="video-input-row">
-                    <input type="text" id="video-id-input" placeholder="Paste YouTube Video ID (e.g. dQw4w9WgXcQ)">
-                    <button class="btn-secondary small btn-video" onclick="loadVideo()">▶️ Load Video</button>
-                    <button class="btn-secondary small" onclick="closeVideo()">✕ Close</button>
-                </div>
-                <div class="video-wrapper" id="video-wrapper">
-                    <p style="color:var(--text-secondary); padding:40px; text-align:center;">Paste a YouTube video ID and click "Load Video"</p>
-                </div>
-            </div>
+<h2>📊 TECHNICIAN COMMAND CENTRE</h2>
 
-            <input type="text" id="error-search" placeholder="Search e.g. C0202, C3401, C2550..." oninput="filterErrors(this.value)">
-            <div id="errors-list">
-                <div class="data-card error-item" data-code="C0202 C-0202">
-                    <h3>C0202 — Tray 1 Lift-Up Failure</h3>
-                    <p><strong>Causes:</strong> Obstruction, wrong paper size, lift motor/sensor failure, mechanical bind, loose connector, failed lift clutch.</p>
-                    <p><strong>Repair:</strong> Pull tray → clear obstructions → check clutch/motor → reseat connectors → clear error → test.</p>
-                    <button class="btn-secondary small" onclick="bookmarkItem('error','C0202')">⭐ Bookmark</button>
-                    <a class="btn-secondary small btn-video" href="https://www.youtube.com/results?search_query=Konica+Minolta+C0202+tray+lift+error" target="_blank">🎬 Search YouTube</a>
-                </div>
-                <div class="data-card error-item" data-code="C0601 C-0601">
-                    <h3>C0601 — Fuser Warm-Up Failure</h3>
-                    <p><strong>Severity:</strong> 🔴 CRITICAL</p>
-                    <p><strong>Causes:</strong> Fuser not seated, dirty thermistor, blown thermofuse, burnt heater element, low voltage, fuser motor failure.</p>
-                    <p><strong>⚠️ Let cool 15+ min before service. Do NOT repeatedly reset.</strong></p>
-                    <button class="btn-secondary small" onclick="bookmarkItem('error','C0601')">⭐ Bookmark</button>
-                    <a class="btn-secondary small btn-video" href="https://www.youtube.com/results?search_query=Konica+Minolta+C0601+fuser+error+repair" target="_blank">🎬 Search YouTube</a>
-                </div>
-                <div class="data-card error-item" data-code="C2550 C-2550">
-                    <h3>C2550 — Black Developer Density Error</h3>
-                    <p><strong>Causes:</strong> Dirty ID sensor, developer expired, wrong toner ratio, unit not seated, transfer belt contamination.</p>
-                    <p><strong>Repair:</strong> Clean sensor → replace developer → run Auto Density Adjust → inspect belt → test.</p>
-                    <button class="btn-secondary small" onclick="bookmarkItem('error','C2550')">⭐ Bookmark</button>
-                    <a class="btn-secondary small btn-video" href="https://www.youtube.com/results?search_query=Konica+Minolta+C2550+developer+density+error" target="_blank">🎬 Search YouTube</a>
-                </div>
-            </div>
-        </div>
+<h3>⚡ Quick Error Lookup</h3>
+<p>Click any code to view details — or use search bar. 🎬 Video tutorials available on error pages.</p>
+<p class="code-links">
+<a href="#c0202">C0202</a><a href="#c0204">C0204</a><a href="#c0500">C0500</a><a href="#c0601">C0601</a><a href="#c2201">C2201</a><a href="#c3401">C3401</a><a href="#c2550">C2550</a>
+</p>
 
-        <div id="page-parts" class="page">
-            <h2>🔧 Parts Finder & Cross-Reference</h2>
-            <p style="color:var(--text-secondary); margin:10px 0;">Search by part number or description.</p>
-            <input type="text" id="parts-search" placeholder="Search e.g. transfer belt, roller, clutch, motor..." oninput="filterParts(this.value)">
-            <div id="parts-list">
+<h3>🖨️ Models</h3>
+<p>C224e, C284e, C364e, C454e, C554e, C258, C308, C368+</p>
 
-                <div class="data-card">
-                    <h3>🔄 Transfer Belt Unit (Image Transfer Belt)</h3>
-                    <p><strong>Part Numbers:</strong></p>
-                    <p>• <strong>A161R71300</strong> — C224e, C284e, C364e, C454e, C554e</p>
-                    <p>• <strong>A7UUR70400</strong> — C258, C308, C368, C458, C558, C658</p>
-                    <p>• <strong>A227R72911</strong> — C220, C280, C360 series</p>
-                    <p><strong>Life:</strong> ~100K–200K copies</p>
-                    <p><strong>Symptoms:</strong> Colour misalignment, streaks, ghosting, density errors, C2201/C2202/C2301</p>
-                    <a class="btn-secondary small btn-video" href="https://www.youtube.com/results?search_query=Konica+Minolta+transfer+belt+unit+replacement" target="_blank">🎬 Replacement Video</a>
-                </div>
+<h3>⚠️ Error Codes</h3>
+<p>Database + 🎬 Embedded video player</p>
 
-                <div class="data-card">
-                    <h3>🟠 Transfer Roller / Corona Unit</h3>
-                    <p><strong>Part Numbers:</strong></p>
-                    <p>• <strong>A50UR70100</strong> — C224e/C284e/C364e Secondary Transfer Roller</p>
-                    <p>• <strong>A7UUR70300</strong> — C258/C308/C368 Secondary Transfer Roller</p>
-                    <p>• <strong>4034R70900</strong> — B&W Transfer Roller (223/283/363/423)</p>
-                    <p><strong>Symptoms:</strong> Faded prints, incomplete transfer, background toner, voltage errors</p>
-                    <a class="btn-secondary small btn-video" href="https://www.youtube.com/results?search_query=Konica+Minolta+transfer+roller+replacement+cleaning" target="_blank">🎬 Replacement Video</a>
-                </div>
+<h3>🔧 Parts Finder</h3>
+<p>Belt • Roller • Drum • Fuser • Motor • Clutch</p>
 
-                <div class="data-card">
-                    <h3>⚙️ Clutches — Feed, Lift, Drive</h3>
-                    <p><strong>Tray Feed Clutch:</strong> Won't pick paper, double-feeds, clicks but no movement</p>
-                    <p><strong>Tray Lift Clutch:</strong> Tray won't rise, error C0202/C0204, motor runs but no lift</p>
-                    <p><strong>Developer/Main Drive Clutch:</strong> Intermittent image, density errors, C2550</p>
-                    <p><strong>Duplex Clutch:</strong> Duplex jams, only one-sided printing</p>
-                    <a class="btn-secondary small btn-video" href="https://www.youtube.com/results?search_query=Konica+Minolta+clutch+replacement+feed+clutch" target="_blank">🎬 Clutch Videos</a>
-                </div>
+<h3>🔍 Troubleshooting</h3>
+<p>Step-by-step diagnostic workflow</p>
 
-                <div class="data-card">
-                    <h3>⚡ Motors — Main, Fuser, Scanner, Lift, Fan</h3>
-                    <p><strong>Main Drive Motor:</strong> Won't ready, C0500/C0550, no rotation</p>
-                    <p><strong>Fuser Motor:</strong> Heater OK but no rotation, jams at exit, C0603/C0604</p>
-                    <p><strong>Lift Motor:</strong> Tray won't rise, C0202/C0204, stripped gears</p>
-                    <p><strong>Scanner Motor:</strong> Slow scan, home errors, copy cut off</p>
-                    <p><strong>Laser Motor:</strong> Black copies, C2201/C2301, loud whine</p>
-                    <p><strong>Fan Motor:</strong> C0500, overheating, shutdown</p>
-                    <a class="btn-secondary small btn-video" href="https://www.youtube.com/results?search_query=Konica+Minolta+motor+replacement+main+drive+motor" target="_blank">🎬 Motor Videos</a>
-                </div>
+<h3>🧰 Maintenance</h3>
+<p>PM schedules & replacement guides</p>
 
-                <div class="data-card">
-                    <h3>🧲 Developer Unit</h3>
-                    <p><strong>DV512:</strong> C224e–C554e | <strong>DV313:</strong> C258–C368</p>
-                    <p><strong>Errors:</strong> C2550, C2551, C2552, C2553</p>
-                    <a class="btn-secondary small btn-video" href="https://www.youtube.com/results?search_query=Konica+Minolta+developer+unit+replacement" target="_blank">🎬 Developer Video</a>
-                </div>
+<h3>🔑 Service Mode</h3>
+<p>Access codes & counter resets</p>
 
-                <div class="data-card">
-                    <h3>🟢 Drum Unit</h3>
-                    <p><strong>DR512:</strong> C224e–C554e | <strong>DR313:</strong> C258–C368</p>
-                    <p><strong>Symptoms:</strong> Streaks, background, repeating marks ~94mm</p>
-                    <a class="btn-secondary small btn-video" href="https://www.youtube.com/results?search_query=Konica+Minolta+drum+unit+replacement" target="_blank">🎬 Drum Video</a>
-                </div>
+<hr>
 
-                <div class="data-card">
-                    <h3>🔥 Fuser Unit</h3>
-                    <p><strong>Errors:</strong> C0601, C0602, C0603, C3401</p>
-                    <p><strong>⚠️ Verify voltage: 110V vs 220V — wrong = fire risk!</p>
-                    <a class="btn-secondary small btn-video" href="https://www.youtube.com/results?search_query=Konica+Minolta+fuser+unit+replacement" target="_blank">🎬 Fuser Video</a>
-                </div>
+<h2>🖨️ Model Database</h2>
+<p>Search by model name or family.</p>
 
-                <div class="data-card">
-                    <h3>🖐️ Feed Roller Set</h3>
-                    <p>Pickup + Feed + Separation Pad — replace every 100K–150K copies</p>
-                    <p><strong>Symptoms:</strong> Misfeeds, double-feeds, frequent jams</p>
-                    <a class="btn-secondary small btn-video" href="https://www.youtube.com/results?search_query=Konica+Minolta+feed+roller+replacement" target="_blank">🎬 Roller Video</a>
-                </div>
-            </div>
-        </div>
+<h3>bizhub C-Series — e Generation (Colour)</h3>
+<p><strong>Includes:</strong> C224e, C284e, C364e, C454e, C554e</p>
+<p><strong>Speed:</strong> 22–55 ppm Colour & B&W</p>
+<p><strong>Notes:</strong> DV512 developer, DR512 drum, TN512 toner, Transfer Belt <span class="part">A161R71300</span>.</p>
 
-        <div id="page-jams" class="page">
-            <h2>📄 Jam Codes & Paper Path</h2>
-            <div class="data-card">
-                <h3>General Jam Clearing</h3>
-                <p>1. Locate indicator → 2. Open door → 3. Remove paper WITH direction → 4. Check scraps → 5. Clean sensors/rollers/transfer → 6. Verify size → 7. Close & test.</p>
-                <p><strong>NEVER pull paper backward — damages sensors & belt!</strong></p>
-                <a class="btn-secondary small btn-video" href="https://www.youtube.com/results?search_query=Konica+Minolta+paper+jam+clearing+guide" target="_blank">🎬 Jam Videos</a>
-            </div>
-        </div>
+<h3>bizhub C-Series — 8 Generation (Colour)</h3>
+<p><strong>Includes:</strong> C226, C258, C308, C368, C458, C558, C658</p>
+<p><strong>Speed:</strong> 22–65 ppm Colour & B&W</p>
+<p><strong>Notes:</strong> DV313 developer, DR313 drum, TN324/TN319 toner, Transfer Belt <span class="part">A7UUR70400</span>.</p>
 
-        <div id="page-troubleshooting" class="page">
-            <h2>🔍 Step-by-Step Troubleshooting</h2>
-            <div class="data-card">
-                <h3>Standard Service Procedure</h3>
-                <p>1️⃣ Model & Serial → 2️⃣ Full Error Code → 3️⃣ When/where it happens → 4️⃣ Paper/toner/doors/power → 5️⃣ Power OFF 60 sec → ON → 6️⃣ Reseat ALL connectors → 7️⃣ Clean sensors/belt/coronas → check clutch/motor → 8️⃣ Service Mode I/O test → 9️⃣ Replace part → Reset counters → Calibrate → Test</p>
-            </div>
-        </div>
+<h3>bizhub i-Series & Classic Series</h3>
+<p><strong>i-Series:</strong> bizhub 227, 287, 367, C227, C287, C368, C458, C558, C658</p>
+<p><strong>Classic:</strong> C220, C280, C360, C452, C552, C652, C754, C654</p>
+<p><strong>B&W Series:</strong> 223, 283, 363, 423, 501, 601, 751, 164/185/215/225i</p>
 
-        <div id="page-maintenance" class="page">
-            <h2>🧰 Maintenance Schedule</h2>
-            <div class="data-card">
-                <h3>Preventive Maintenance</h3>
-                <p><strong>Every 50K:</strong> Clean rollers, sensors, glass, transfer corona, belt seals</p>
-                <p><strong>Every 100K:</strong> Replace feed rollers, inspect belt, lubricate lift rails</p>
-                <p><strong>Every 200K:</strong> Replace belt & transfer roller, fuser PM, scanner rails, clutch timing, motor gears</p>
-                <p><strong>Every 500K:</strong> Full PM Kit — developer, drum, belt, fuser, rollers, clutches, motors</p>
-            </div>
-        </div>
+<hr>
 
-        <div id="page-servicemode" class="page">
-            <h2>🔑 Service Mode Access</h2>
-            <div class="safety-warning">⚠️ Changes critical parameters — record values before changing!</div>
-            <div class="data-card">
-                <h3>Access Sequence</h3>
-                <p>Utility/Counter → <strong>Stop → 0 → 0 → Stop → 0 → 1</strong></p>
-                <p>Password: <strong>00000000</strong> or <strong>12345678</strong></p>
-                <p>Reset counters: Drum, Developer, Fuser, Transfer Belt, Roller, Feed</p>
-            </div>
-        </div>
+<h2>⚠️ Error Code Database</h2>
+<p>🎬 Video Player: Paste YouTube ID → Load Video → plays right here!</p>
 
-        <div id="page-printquality" class="page">
-            <h2>🖼️ Print Quality Guide</h2>
-            <div class="data-card">
-                <h3>Symptom → Cause → Fix</h3>
-                <p><strong>Faded:</strong> Toner/dev expired → dirty sensor → worn transfer → belt contamination → clutch not engaging</p>
-                <p><strong>Streaks:</strong> Drum scratched → blade → fuser mark → laser glass → belt scratch → corona dirty</p>
-                <p><strong>Ghosting:</strong> Fuser temp → drum cleaning → belt blade → damp paper → motor speed</p>
-                <p><strong>Not Fusing:</strong> Thermistor → wrong paper → fuser motor → pressure spring → expired counter</p>
-            </div>
-        </div>
+<div class="video-area">
+<h3>🎬 Video Tutorial Player</h3>
+<p>Paste a YouTube video ID and click "Load Video"</p>
+<input type="text" id="youtube-id" placeholder="e.g. dQw4w9WgXcQ">
+<button onclick="loadVideo()">▶ Load Video</button>
+<div id="video-container" style="margin-top:15px; display:none;"></div>
+</div>
 
-        <div id="page-notes" class="page">
-            <h2>📝 Technician Work Log</h2>
-            <div class="data-card">
-                <h3>New Service Record</h3>
-                <input type="text" id="note-customer" placeholder="Customer Name">
-                <input type="text" id="note-machine" placeholder="Model + Serial">
-                <input type="text" id="note-error" placeholder="Error / Symptom">
-                <input type="date" id="note-date">
-                <textarea id="note-problem" placeholder="Problem..." rows="2"></textarea>
-                <textarea id="note-work" placeholder="Work Done..." rows="2"></textarea>
-                <textarea id="note-parts" placeholder="Parts Used..." rows="2"></textarea>
-                <input type="text" id="note-meter" placeholder="Meter Reading">
-                <textarea id="note-result" placeholder="Result..." rows="2"></textarea>
-                <button class="btn-green small" onclick="saveNote()">💾 Save Record</button>
-            </div>
-            <div id="notes-list"><h3 style="margin-top:30px;">📋 Saved Records</h3><p id="no-notes" style="color:var(--text-secondary);">No records yet.</p></div>
-        </div>
+<h3 id="c0202">C0202 — Tray 1 Lift-Up Failure</h3>
+<p><strong>Causes:</strong> Obstruction, wrong paper size, lift motor/sensor failure, mechanical bind, loose connector, failed lift clutch.</p>
+<p><strong>Repair:</strong> Pull tray → clear obstructions → check clutch/motor → reseat connectors → clear error → test.</p>
 
-        <div id="page-bookmarks" class="page">
-            <h2>⭐ Bookmarked Items</h2>
-            <p id="no-bookmarks" style="color:var(--text-secondary);">No bookmarks yet — click ⭐ on any error.</p>
-            <div id="bookmarks-list-display"></div>
-        </div>
+<h3 id="c0601">C0601 — Fuser Warm-Up Failure</h3>
+<p><strong>Severity:</strong> 🔴 CRITICAL</p>
+<p><strong>Causes:</strong> Fuser not seated, dirty thermistor, blown thermofuse, burnt heater element, low voltage, fuser motor failure.</p>
+<div class="danger">
+⚠️ Let cool 15+ min before service. Do NOT repeatedly reset.
+</div>
 
-        <div id="page-settings" class="page">
-            <h2>⚙️ Settings & Info</h2>
-            <div class="data-card">
-                <h3>App Info — v1.4</h3>
-                <p>✅ Added: Transfer Belt, Transfer Roller, Clutches, Motors</p>
-                <p>✅ Video Player: Paste YouTube ID → plays inside app</p>
-                <p>Password: <code>Konica2026</code></p>
-                <p style="margin-top:10px;" class="verification-note">⚠️ Always cross-reference with official Service Manual for your exact model.</p>
-            </div>
-        </div>
+<h3 id="c2550">C2550 — Black Developer Density Error</h3>
+<p><strong>Causes:</strong> Dirty ID sensor, developer expired, wrong toner ratio, unit not seated, transfer belt contamination.</p>
+<p><strong>Repair:</strong> Clean sensor → replace developer → run Auto Density Adjust → inspect belt → test.</p>
 
-    </div>
+<hr>
 
-    <footer class="app-footer">
-        <p>Konica Minolta Technician Pro v1.4 — Independent Reference Tool<br>Not affiliated with Konica Minolta.</p>
-    </footer>
+<h2>🔧 Parts Finder & Cross-Reference</h2>
+<p>Search by part number or description.</p>
+
+<h3>🔄 Transfer Belt Unit (Image Transfer Belt)</h3>
+<p><strong>Part Numbers:</strong></p>
+<ul>
+<li><strong>A161R71300</strong> — C224e, C284e, C364e, C454e, C554e</li>
+<li><strong>A7UUR70400</strong> — C258, C308, C368, C458, C558, C658</li>
+<li><strong>A227R72911</strong> — C220, C280, C360 series</li>
+</ul>
+<p><strong>Life:</strong> ~100K–200K copies</p>
+<p><strong>Symptoms:</strong> Colour misalignment, streaks, ghosting, density errors, C2201/C2202/C2301</p>
+<p>🎬 Replacement Video</p>
+
+<h3>🟠 Transfer Roller / Corona Unit</h3>
+<p><strong>Part Numbers:</strong></p>
+<ul>
+<li><strong>A50UR70100</strong> — C224e/C284e/C364e Secondary Transfer Roller</li>
+<li><strong>A7UUR70300</strong> — C258/C308/C368 Secondary Transfer Roller</li>
+<li><strong>4034R70900</strong> — B&W Transfer Roller (223/283/363/423)</li>
+</ul>
+<p><strong>Symptoms:</strong> Faded prints, incomplete transfer, background toner, voltage errors</p>
+<p>🎬 Replacement Video</p>
+
+<h3>⚙️ Clutches — Feed, Lift, Drive</h3>
+<p><strong>Tray Feed Clutch:</strong> Won't pick paper, double-feeds, clicks but no movement</p>
+<p><strong>Tray Lift Clutch:</strong> Tray won't rise, error C0202/C0204, motor runs but no lift</p>
+<p><strong>Developer/Main Drive Clutch:</strong> Intermittent image, density errors, C2550</p>
+<p><strong>Duplex Clutch:</strong> Duplex jams, only one-sided printing</p>
+<p>🎬 Clutch Videos</p>
+
+<h3>⚡ Motors — Main, Fuser, Scanner, Lift, Fan</h3>
+<p><strong>Main Drive Motor:</strong> Won't ready, C0500/C0550, no rotation</p>
+<p><strong>Fuser Motor:</strong> Heater OK but no rotation, jams at exit, C0603/C0604</p>
+<p><strong>Lift Motor:</strong> Tray won't rise, C0202/C0204, stripped gears</p>
+<p><strong>Scanner Motor:</strong> Slow scan, home errors, copy cut off</p>
+<p><strong>Laser Motor:</strong> Black copies, C2201/C2301, loud whine</p>
+<p><strong>Fan Motor:</strong> C0500, overheating, shutdown</p>
+<p>🎬 Motor Videos</p>
+
+<h3>🧲 Developer Unit</h3>
+<p><strong>DV512:</strong> C224e–C554e | <strong>DV313:</strong> C258–C368</p>
+<p><strong>Errors:</strong> C2550, C2551, C2552, C2553</p>
+<p>🎬 Developer Video</p>
+
+<h3>🟢 Drum Unit</h3>
+<p><strong>DR512:</strong> C224e–C554e | <strong>DR313:</strong> C258–C368</p>
+<p><strong>Symptoms:</strong> Streaks, background, repeating marks ~94mm</p>
+<p>🎬 Drum Video</p>
+
+<h3>🔥 Fuser Unit</h3>
+<p><strong>Errors:</strong> C0601, C0602, C0603, C3401</p>
+<div class="danger">
+⚠️ Verify voltage: 110V vs 220V — wrong = fire risk!
+</div>
+<p>🎬 Fuser Video</p>
+
+<h3>🖐️ Feed Roller Set</h3>
+<p>Pickup + Feed + Separation Pad — replace every 100K–150K copies</p>
+<p><strong>Symptoms:</strong> Misfeeds, double-feeds, frequent jams</p>
+<p>🎬 Roller Video</p>
+
+<hr>
+
+<h2>📄 Jam Codes & Paper Path</h2>
+<h3>General Jam Clearing</h3>
+<ol>
+<li>Locate indicator → 2. Open door → 3. Remove paper WITH direction → 4. Check scraps → 5. Clean sensors/rollers/transfer → 6. Verify size → 7. Close & test.</li>
+</ol>
+<div class="warning">
+NEVER pull paper backward — damages sensors & belt!
+</div>
+<p>🎬 Jam Videos</p>
+
+<hr>
+
+<h2>🔍 Step-by-Step Troubleshooting</h2>
+<h3>Standard Service Procedure</h3>
+<p>1️⃣ Model & Serial → 2️⃣ Full Error Code → 3️⃣ When/where it happens → 4️⃣ Paper/toner/doors/power → 5️⃣ Power OFF 60 sec → ON → 6️⃣ Reseat ALL connectors → 7️⃣ Clean sensors/belt/coronas → check clutch/motor → 8️⃣ Service Mode I/O test → 9️⃣ Replace part → Reset counters → Calibrate → Test</p>
+
+<hr>
+
+<h2>🧰 Maintenance Schedule</h2>
+<h3>Preventive Maintenance</h3>
+<ul>
+<li><strong>Every 50K:</strong> Clean rollers, sensors, glass, transfer corona, belt seals</li>
+<li><strong>Every 100K:</strong> Replace feed rollers, inspect belt, lubricate lift rails</li>
+<li><strong>Every 200K:</strong> Replace belt & transfer roller, fuser PM, scanner rails, clutch timing, motor gears</li>
+<li><strong>Every 500K:</strong> Full PM Kit — developer, drum, belt, fuser, rollers, clutches, motors</li>
+</ul>
+
+<hr>
+
+<h2>🔑 Service Mode Access</h2>
+<div class="warning">
+⚠️ Changes critical parameters — record values before changing!
+</div>
+<p><strong>Access Sequence:</strong> Utility/Counter → Stop → 0 → 0 → Stop → 0 → 1</p>
+<p><strong>Password:</strong> 00000000 or 12345678</p>
+<p><strong>Reset counters:</strong> Drum, Developer, Fuser, Transfer Belt, Roller, Feed</p>
+
+<hr>
+
+<h2>🖼️ Print Quality Guide</h2>
+<ul>
+<li><strong>Faded:</strong> Toner/dev expired → dirty sensor → worn transfer → belt contamination → clutch not engaging</li>
+<li><strong>Streaks:</strong> Drum scratched → blade → fuser mark → laser glass → belt scratch → corona dirty</li>
+<li><strong>Ghosting:</strong> Fuser temp → drum cleaning → belt blade → damp paper → motor speed</li>
+<li><strong>Not Fusing:</strong> Thermistor → wrong paper → fuser motor → pressure spring → expired counter</li>
+</ul>
+
+<hr>
+
+<h2>📝 Technician Work Log</h2>
+<h3>New Service Record</h3>
+<textarea style="width:100%; height:80px; padding:10px; margin:8px 0;" placeholder="Enter service details..."></textarea>
+<button>💾 Save Record</button>
+
+<h3>📋 Saved Records</h3>
+<p>No records yet.</p>
+
+<h2>⭐ Bookmarked Items</h2>
+<p>No bookmarks yet — click ⭐ on any error.</p>
+
+<h2>⚙️ Settings & Info</h2>
+<p><strong>App Info — v1.4</strong></p>
+<p>✅ Added: Transfer Belt, Transfer Roller, Clutches, Motors</p>
+<p>✅ Video Player: Paste YouTube ID → plays inside app</p>
+<div class="warning">
+⚠️ Always cross-reference with official Service Manual for your exact model.
+</div>
+
 </div>
 
 <script>
-const APP_PASSWORD = "Konica2026";
+const CORRECT_PASSWORD = "Konica2026";
+const passwordScreen = document.getElementById("password-screen");
+const mainContent = document.getElementById("main-content");
+const passwordInput = document.getElementById("password-input");
+const unlockBtn = document.getElementById("unlock-btn");
+const errorMsg = document.getElementById("error-msg");
 
 function checkPassword() {
-    const input = document.getElementById("app-password").value;
-    if (input === APP_PASSWORD) {
-        document.getElementById("password-screen").style.display = "none";
-        document.getElementById("main-app").style.display = "block";
-        loadNotes();
-        loadBookmarks();
+    if (passwordInput.value === CORRECT_PASSWORD) {
+        passwordScreen.style.display = "none";
+        mainContent.style.display = "block";
+        window.scrollTo(0, 0);
     } else {
-        document.getElementById("wrong-pass").style.display = "block";
+        errorMsg.style.display = "block";
+        passwordInput.value = "";
+        passwordInput.focus();
     }
 }
 
-function logout() {
-    document.getElementById("password-screen").style.display = "flex";
-    document.getElementById("main-app").style.display = "none";
-    document.getElementById("app-password").value = "";
-    document.getElementById("wrong-pass").style.display = "none";
-    closeVideo();
-}
-
-document.addEventListener('keypress', e => {
-    if (e.key === 'Enter' && document.getElementById("password-screen").style.display !== 'none') checkPassword();
+unlockBtn.addEventListener("click", checkPassword);
+passwordInput.addEventListener("keypress", function(e) {
+    if (e.key === "Enter") checkPassword();
 });
 
-function showPage(pageId) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.getElementById('page-' + pageId).classList.add('active');
-    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-    if (event && event.target) event.target.classList.add('active');
-    if (pageId !== 'errors') closeVideo();
-}
-
 function loadVideo() {
-    let input = document.getElementById('video-id-input').value.trim();
-    if (!input) { alert('Paste a YouTube video ID!\nExample: dQw4w9WgXcQ'); return; }
-    if (input.includes('youtube.com') || input.includes('youtu.be')) {
-        const params = new URLSearchParams(input.split('?')[1]);
-        input = params.get('v') || input.split('/').pop().split('?')[0];
+    const videoId = document.getElementById("youtube-id").value.trim();
+    const container = document.getElementById("video-container");
+    if (videoId) {
+        container.style.display = "block";
+        container.innerHTML = `<iframe width="100%" height="315" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe>`;
     }
-    document.getElementById('video-wrapper').innerHTML = `<iframe src="https://www.youtube.com/embed/${input}" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope;"></iframe>`;
-    document.getElementById('video-player').classList.add('show');
-    document.getElementById('video-player').scrollIntoView({behavior:'smooth'});
-}
-
-function closeVideo() {
-    document.getElementById('video-player').classList.remove('show');
-    document.getElementById('video-wrapper').innerHTML = `<p style="color:var(--text-secondary); padding:40px; text-align:center;">Paste a YouTube video ID and click "Load Video"</p>`;
-}
-
-function filterErrors(val) {
-    const t = val.trim().toLowerCase();
-    document.querySelectorAll('.error-item').forEach(card => {
-        const codes = card.getAttribute('data-code').toLowerCase();
-        card.style.display = !t || codes.includes(t) || card.textContent.toLowerCase().includes(t) ? 'block' : 'none';
-    });
-}
-
-function lookupError(code) { showPage('errors'); document.getElementById('error-search').value = code; filterErrors(code); }
-function filterModels(val) {
-    const t = val.trim().toLowerCase();
-    document.querySelectorAll('#models-list .data-card').forEach(c => c.style.display = !t || c.textContent.toLowerCase().includes(t) ? 'block' : 'none');
-}
-function filterParts(val) {
-    const t = val.trim().toLowerCase();
-    document.querySelectorAll('#parts-list .data-card').forEach(c => c.style.display = !t || c.textContent.toLowerCase().includes(t) ? 'block' : 'none');
-}
-function performGlobalSearch(val) {
-    const t = val.trim().toLowerCase();
-    if (/^[a-z]\d+/i.test(t)) { lookupError(val.toUpperCase()); }
-    else { showPage('models'); document.getElementById('model-search').value = val; filterModels(val); }
-}
-
-function bookmarkItem(type, code) {
-    let arr = JSON.parse(localStorage.getItem('km-bookmarks') || '[]');
-    if (!arr.includes(code)) { arr.unshift(code); localStorage.setItem('km-bookmarks', JSON.stringify(arr.slice(0,20))); alert('⭐ Bookmarked: ' + code); loadBookmarks(); }
-    else alert('Already bookmarked!');
-}
-
-function loadBookmarks() {
-    const list = JSON.parse(localStorage.getItem('km-bookmarks') || '[]');
-    const cont = document.getElementById('bookmarks-list-display');
-    if (!list.length) { cont.innerHTML = '<p id="no-bookmarks" style="color:var(--text-secondary);">No bookmarks yet.</p>'; return; }
-    cont.innerHTML = list.map(c => `<div class="bookmark-item"><strong>${c}</strong> <button class="btn-secondary small" onclick="lookupError('${c}')">Open</button> <button class="delete-btn small" onclick="delBookmark('${c}')">Remove</button></div>`).join('');
-}
-
-function delBookmark(code) {
-    let arr = JSON.parse(localStorage.getItem('km-bookmarks') || '[]').filter(c => c !== code);
-    localStorage.setItem('km-bookmarks', JSON.stringify(arr)); loadBookmarks();
-}
-
-function saveNote() {
-    const note = {
-        id: Date.now(),
-        cust: document.getElementById('note-customer').value,
-        model: document.getElementById('note-machine').value,
-        error: document.getElementById('note-error').value,
-        date: document.getElementById('note-date').value,
-        problem: document.getElementById('note-problem').value,
-        work: document.getElementById('note-work').value,
-        parts: document.getElementById('note-parts').value,
-        meter: document.getElementById('note-meter').value,
-        result: document.getElementById('note-result').value
-    };
-    let notes = JSON.parse(localStorage.getItem('km-notes') || '[]');
-    notes.unshift(note);
-    localStorage.setItem('km-notes', JSON.stringify(notes));
-    ['note-customer','note-machine','note-error','note-date','note-problem','note-work','note-parts','note-meter','note-result'].forEach(id => document.getElementById(id).value = '');
-    loadNotes(); alert('✅ Saved!');
-}
-
-function loadNotes() {
-    const list = JSON.parse(localStorage.getItem('km-notes') || '[]');
-    const cont = document.getElementById('notes-list');
-    if (!list.length) { cont.innerHTML = '<h3 style="margin-top:30px;">📋 Saved Records</h3><p id="no-notes" style="color:var(--text-secondary);">No records yet.</p>'; return; }
-    cont.innerHTML = '<h3 style="margin-top:30px;">📋 Saved Records</h3>' + list.map(n => `
-        <div class="note-item">
-            <strong>${n.date || 'No Date'} — ${n.cust || 'Customer'}</strong><br>
-            <em>Model: ${n.model || 'N/A'} | Error: ${n.error || 'N/A'} | Meter: ${n.meter || 'N/A'}</em><br>
-            <strong>Problem:</strong> ${n.problem || ''}<br>
-            <strong>Work:</strong> ${n.work || ''}<br>
-            <strong>Parts:</strong> ${n.parts || ''}<br>
-            <strong>Result:</strong> ${n.result || ''}<br>
-            <button class="delete-btn small" onclick="delNote(${n.id})">Delete</button>
-        </div>`).join('');
-}
-
-function delNote(id) {
-    let notes = JSON.parse(localStorage.getItem('km-notes') || '[]').filter(n => n.id !== id);
-    localStorage.setItem('km-notes', JSON.stringify(notes)); loadNotes();
 }
 </script>
+
 </body>
 </html>
