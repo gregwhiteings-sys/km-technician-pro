@@ -47,7 +47,7 @@
         .btn-secondary {
             padding: 10px 14px; font-size: 13px; background: #333; color: white;
             border: none; border-radius: 6px; cursor: pointer; margin: 5px 5px 5px 0;
-            display: inline-flex; align-items: center; gap: 6px;
+            display: inline-flex; align-items: center; gap: 6px; text-decoration: none;
         }
         .btn-secondary:hover { background: #444; }
         .btn-video { background: var(--video); }
@@ -189,17 +189,17 @@
         <input type="password" class="password-input" id="app-password" placeholder="Enter password...">
         <button class="btn-primary" onclick="checkPassword()">🔓 UNLOCK APP</button>
         <p class="error-msg" id="wrong-pass">❌ Wrong password — try again!</p>
-        <p class="version-label">Version 1.2 • 🎬 Video Tutorials Added</p>
-        <div class="disclaimer-text">
+        <p class="version-label">Version 1.2 • 🎬 Videos + Search + Notes + Bookmarks</p>
+        <div class="disclaimer-text>">
+            Password: <strong>Konica2026</strong><br><br>
             Independent technician reference tool.<br>Not affiliated with or endorsed by Konica Minolta.<br>
-            Videos are for educational purposes — always verify with official service manuals.
+            Videos are for educational reference only.
         </div>
     </div>
 </div>
 
 <!-- ============== MAIN APP ============== -->
 <div id="main-app">
-    <!-- Header -->
     <header class="app-header">
         <h1>🖨️ KM Technician Pro</h1>
         <div class="search-bar">
@@ -212,7 +212,6 @@
         </div>
     </header>
 
-    <!-- Navigation -->
     <nav class="nav-container">
         <div class="nav-grid">
             <button class="nav-btn active" onclick="showPage('dashboard')">📊 Dashboard</button>
@@ -228,14 +227,12 @@
         </div>
     </nav>
 
-    <!-- Safety Banner -->
     <div style="max-width:1200px; margin:15px auto; padding:0 20px;">
         <div class="safety-warning">
             ⚠️ <strong>WARNING:</strong> Printer/copier servicing involves high voltage, high temperatures, moving machinery, and laser/imaging systems. Only trained personnel should perform service procedures. Always follow the manufacturer's official safety procedures.
         </div>
     </div>
 
-    <!-- ============== CONTENT PAGES ============== -->
     <div class="content-container">
 
         <!-- === DASHBOARD === -->
@@ -321,10 +318,9 @@
         <!-- === ERROR CODES === -->
         <div id="page-errors" class="page">
             <h2>⚠️ Error Code Database</h2>
-            <p style="color:var(--text-secondary); margin:10px 0;">Search by code. 🎬 Click "Watch Video" for visual guides.</p>
+            <p style="color:var(--text-secondary); margin:10px 0;">Search by code. 🎬 Click "Search YouTube" for video guides.</p>
             <input type="text" id="error-search" placeholder="Search e.g. C0202, C3401, C2550..." oninput="filterErrors(this.value)">
 
-            <!-- === VIDEO PLAYER === -->
             <div class="video-container" id="video-player">
                 <h3>🎬 Video Tutorial</h3>
                 <div class="video-wrapper" id="video-wrapper"></div>
@@ -333,19 +329,17 @@
             </div>
 
             <div id="errors-list">
-                <!-- C0202 -->
-                <div class="data-card error-item" data-code="C0202 C-0202" data-video-id="" data-video-desc="Tray lift mechanism troubleshooting guide">
+                <div class="data-card error-item" data-code="C0202 C-0202">
                     <h3>C0202 — Tray 1 Lift-Up Failure</h3>
                     <p><strong>Error Type:</strong> Paper Feed / Tray Mechanism</p>
                     <p><strong>Condition:</strong> Tray lift motor does not reach upper limit within specified time.</p>
                     <p><strong>Causes:</strong> Obstruction, incorrect paper size, lift motor/sensor failure, mechanical bind, loose connector.</p>
                     <p><strong>Repair:</strong> Pull tray → check obstructions → verify paper size → inspect lift wire/gears → reseat connectors → clear error in Service Mode → test.</p>
                     <button class="btn-secondary small" onclick="bookmarkItem('error','C0202')">⭐ Bookmark</button>
-                    <button class="btn-secondary small btn-video" onclick="openVideo('','Tray lift mechanism troubleshooting guide — search YouTube: Konica Minolta C0202 error fix')">🎬 Search Video</button>
+                    <a class="btn-secondary small btn-video" href="https://www.youtube.com/results?search_query=Konica+Minolta+C0202+tray+lift+error" target="_blank">🎬 Search YouTube</a>
                 </div>
 
-                <!-- C0601 -->
-                <div class="data-card error-item" data-code="C0601 C-0601" data-video-id="" data-video-desc="Fuser removal and replacement guide">
+                <div class="data-card error-item" data-code="C0601 C-0601">
                     <h3>C0601 — Fuser Warm-Up Failure</h3>
                     <p><strong>Severity:</strong> 🔴 CRITICAL — Machine will not run.</p>
                     <p><strong>Condition:</strong> Fusing unit does not reach operating temperature within time limit.</p>
@@ -356,8 +350,7 @@
                     <a class="btn-secondary small btn-video" href="https://www.youtube.com/results?search_query=Konica+Minolta+C0601+fuser+error+repair" target="_blank">🎬 Search YouTube</a>
                 </div>
 
-                <!-- C2550 -->
-                <div class="data-card error-item" data-code="C2550 C-2550" data-video-id="" data-video-desc="Developer unit replacement and density calibration">
+                <div class="data-card error-item" data-code="C2550 C-2550">
                     <h3>C2550 — Black Developer Density Error</h3>
                     <p><strong>Error Type:</strong> Imaging / Developer Unit</p>
                     <p><strong>Condition:</strong> Toner density sensor detects abnormal developer-to-toner ratio.</p>
@@ -367,8 +360,7 @@
                     <a class="btn-secondary small btn-video" href="https://www.youtube.com/results?search_query=Konica+Minolta+C2550+developer+density+error" target="_blank">🎬 Search YouTube</a>
                 </div>
 
-                <!-- C3401 -->
-                <div class="data-card error-item" data-code="C3401 C-3401" data-video-id="" data-video-desc="Fuser temperature sensor troubleshooting">
+                <div class="data-card error-item" data-code="C3401 C-3401">
                     <h3>C3401 — Fuser Temperature Error (Low)</h3>
                     <p><strong>Severity:</strong> 🔴 Critical — Machine will not run.</p>
                     <p><strong>Condition:</strong> Fuser temperature remains below lower threshold during standby or operation.</p>
@@ -377,8 +369,7 @@
                     <a class="btn-secondary small btn-video" href="https://www.youtube.com/results?search_query=Konica+Minolta+C3401+error+repair" target="_blank">🎬 Search YouTube</a>
                 </div>
 
-                <!-- C0204 -->
-                <div class="data-card error-item" data-code="C0204 C-0204" data-video-id="" data-video-desc="Tray 2 paper feed troubleshooting">
+                <div class="data-card error-item" data-code="C0204 C-0204">
                     <h3>C0204 — Tray 2 Lift-Up Failure</h3>
                     <p><strong>Error Type:</strong> Paper Feed / Tray Mechanism</p>
                     <p><strong>Condition:</strong> Tray 2 lift motor does not reach upper limit position within time.</p>
@@ -387,8 +378,7 @@
                     <a class="btn-secondary small btn-video" href="https://www.youtube.com/results?search_query=Konica+Minolta+C0204+tray+error" target="_blank">🎬 Search YouTube</a>
                 </div>
 
-                <!-- C0500 -->
-                <div class="data-card error-item" data-code="C0500 C-0500" data-video-id="" data-video-desc="Cooling fan and power supply troubleshooting">
+                <div class="data-card error-item" data-code="C0500 C-0500">
                     <h3>C0500 — Power Supply / Cooling Fan Error</h3>
                     <p><strong>Severity:</strong> ⚠️ Medium — May shut down during operation.</p>
                     <p><strong>Condition:</strong> Main cooling fan or power supply fan rotation signal not detected.</p>
@@ -546,17 +536,16 @@
             <h2>⚙️ Settings & Info</h2>
             <div class="data-card">
                 <h3>Application Info</h3>
-                <p><strong>Version:</strong> 1.2 — 🎬 Video Search & Tutorial Links Added</p>
+                <p><strong>Version:</strong> 1.2 — 🎬 Video Search + Search + Notes + Bookmarks</p>
+                <p><strong>Password:</strong> <code>Konica2026</code></p>
                 <p><strong>Data Storage:</strong> Notes & Bookmarks saved locally in your browser — never sent to a server</p>
                 <p><strong>Works Offline:</strong> Yes — save page to your device</p>
-                <p><strong>Video Feature:</strong> "Search YouTube" buttons open relevant video search results in new tab. You can also embed specific video IDs if you have them.</p>
                 <p style="margin-top:15px;" class="verification-note">⚠️ Always verify procedures, error codes, and part numbers with the official Konica Minolta Service Manual specific to your exact machine model and firmware version. Third-party videos are for educational reference only.</p>
             </div>
         </div>
 
     </div>
 
-    <!-- Footer -->
     <footer class="app-footer">
         <p>Konica Minolta Technician Pro v1.2 — Independent Reference Tool<br>Not affiliated with Konica Minolta. Videos hosted by YouTube.</p>
     </footer>
@@ -565,7 +554,7 @@
 <script>
 const APP_PASSWORD = "Konica2026";
 
-// ============== PASSWORD ==============
+// ============== PASSWORD CHECK ==============
 function checkPassword() {
     const input = document.getElementById("app-password").value;
     if (input === APP_PASSWORD) {
@@ -586,6 +575,13 @@ function logout() {
     closeVideo();
 }
 
+// Allow Enter key to unlock
+document.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter' && document.getElementById("password-screen").style.display !== 'none') {
+        checkPassword();
+    }
+});
+
 // ============== NAVIGATION ==============
 function showPage(pageId) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -595,33 +591,15 @@ function showPage(pageId) {
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
     if (event && event.target) event.target.classList.add('active');
     
-    // Close video when changing pages
     if (pageId !== 'errors') closeVideo();
 }
 
 // ============== VIDEO FUNCTIONS ==============
-function openVideo(videoId, description) {
-    const player = document.getElementById('video-player');
-    const wrapper = document.getElementById('video-wrapper');
-    const desc = document.getElementById('video-description');
-    
-    if (videoId && videoId.trim() !== '') {
-        // Embedded video
-        wrapper.innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>`;
-    } else {
-        wrapper.innerHTML = `<p style="color:var(--text-secondary); padding:40px; text-align:center;">🎬 Click "Search YouTube" button on the error card above to find video tutorials.<br><small>Or enter a YouTube video ID in the code to embed one directly.</small></p>`;
-    }
-    
-    if (description) desc.textContent = description;
-    player.classList.add('show');
-    player.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-}
-
 function closeVideo() {
     const player = document.getElementById('video-player');
     const wrapper = document.getElementById('video-wrapper');
-    player.classList.remove('show');
-    wrapper.innerHTML = '';
+    if (player) player.classList.remove('show');
+    if (wrapper) wrapper.innerHTML = '';
 }
 
 // ============== ERROR SEARCH ==============
@@ -641,7 +619,6 @@ function lookupError(code) {
     showPage('errors');
     document.getElementById('error-search').value = code;
     filterErrors(code);
-    closeVideo();
 }
 
 // ============== MODEL SEARCH ==============
@@ -652,10 +629,6 @@ function filterModels(val) {
         const match = !searchTerm || text.includes(searchTerm);
         card.style.display = match ? 'block' : 'none';
     });
-}
-
-function viewFamily(family) {
-    showPage('errors');
 }
 
 // ============== PARTS SEARCH ==============
@@ -705,7 +678,7 @@ function loadBookmarks() {
     const bookmarks = JSON.parse(localStorage.getItem('km-bookmarks') || '[]');
     
     if (bookmarks.length === 0) {
-        list.innerHTML = '<p id="no-bookmarks" style="color:var(--text-secondary);">No bookmarks yet — click ⭐ on any error to save.</p>';
+        if (list) list.innerHTML = '<p style="color:var(--text-secondary);">No bookmarks yet — click ⭐ on any error to save.</p>';
         if (recentList) recentList.innerHTML = 'No bookmarks yet — click ⭐ on any error to save.';
         return;
     }
@@ -714,7 +687,7 @@ function loadBookmarks() {
     bookmarks.forEach(code => {
         html += `<div class="bookmark-item"><strong>${code}</strong> <button class="btn-secondary small" onclick="lookupError('${code}')">🔍 View</button> <button class="btn-secondary small delete-btn" onclick="removeBookmark('${code}')">✕ Remove</button></div>`;
     });
-    list.innerHTML = html;
+    if (list) list.innerHTML = html;
     if (recentList) recentList.innerHTML = bookmarks.join(', ');
 }
 
@@ -755,4 +728,48 @@ function saveNote() {
     document.getElementById('note-date').value = '';
     document.getElementById('note-problem').value = '';
     document.getElementById('note-work').value = '';
-    document.getElementById
+    document.getElementById('note-parts').value = '';
+    document.getElementById('note-meter').value = '';
+    document.getElementById('note-result').value = '';
+    
+    alert('✅ Service Record Saved!');
+    loadNotes();
+}
+
+function loadNotes() {
+    const list = document.getElementById('notes-list');
+    const notes = JSON.parse(localStorage.getItem('km-notes') || '[]');
+    
+    if (notes.length === 0) {
+        if (list) list.innerHTML = '<h3 style="margin-top:30px;">📋 Saved Records</h3><p style="color:var(--text-secondary);">No saved records yet.</p>';
+        return;
+    }
+    
+    let html = '<h3 style="margin-top:30px;">📋 Saved Records (' + notes.length + ')</h3>';
+    notes.forEach(note => {
+        html += `<div class="note-item">
+            <strong>${note.customer || 'No Customer'}</strong> — ${note.machine || 'Unknown Machine'}
+            ${note.date ? `<br><small>📅 ${note.date}</small>` : ''}
+            ${note.error ? `<br>⚠️ <strong>Error:</strong> ${note.error}` : ''}
+            ${note.problem ? `<br><strong>Problem:</strong> ${note.problem}` : ''}
+            ${note.work ? `<br><strong>Work:</strong> ${note.work}` : ''}
+            ${note.parts ? `<br><strong>Parts:</strong> ${note.parts}` : ''}
+            ${note.meter ? `<br><strong>Meter:</strong> ${note.meter}` : ''}
+            ${note.result ? `<br><strong>Result:</strong> ${note.result}` : ''}
+            <br><button class="btn-secondary small delete-btn" onclick="deleteNote(${note.id})">🗑️ Delete Record</button>
+        </div>`;
+    });
+    if (list) list.innerHTML = html;
+}
+
+function deleteNote(id) {
+    if (!confirm('Delete this service record?')) return;
+    let notes = JSON.parse(localStorage.getItem('km-notes') || '[]');
+    notes = notes.filter(n => n.id !== id);
+    localStorage.setItem('km-notes', JSON.stringify(notes));
+    loadNotes();
+}
+</script>
+
+</body>
+</html>
