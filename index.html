@@ -3,420 +3,294 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KM Technician Pro — Konica Minolta Reference Tool</title>
+    <title>KM Technician Pro</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
-        body { background: #f5f5f5; padding: 20px; line-height: 1.6; color: #333; }
-        
-        /* 🔐 Password Screen */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; line-height: 1.6; padding: 20px; color: #333; }
+
+        /* 🔐 Password Screen — Clean, simple */
         #password-screen {
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             min-height: 80vh; text-align: center;
         }
         #password-screen h1 { color: #0066B3; margin-bottom: 10px; font-size: 28px; }
-        #password-screen .subtitle { color: #666; margin-bottom: 30px; font-size: 16px; }
+        #password-screen p { color: #666; margin-bottom: 25px; }
         #password-input {
-            padding: 12px 16px; font-size: 18px; width: 280px; border: 2px solid #ddd;
-            border-radius: 8px; margin-bottom: 15px; text-align: center;
+            padding: 12px 16px; font-size: 18px; width: 260px; border: 2px solid #ddd;
+            border-radius: 8px; margin-bottom: 12px; text-align: center;
         }
         #unlock-btn {
-            padding: 12px 36px; font-size: 18px; background: #0066B3; color: white;
-            border: none; border-radius: 8px; cursor: pointer; font-weight: 600;
+            padding: 12px 32px; font-size: 18px; background: #0066B3; color: white;
+            border: none; border-radius: 8px; cursor: pointer;
         }
         #unlock-btn:hover { background: #005299; }
         #error-msg { color: red; margin-top: 12px; display: none; }
-        .disclaimer {
-            margin-top: 40px; font-size: 12px; color: #888; max-width: 400px;
-            line-height: 1.5;
-        }
+        .tiny-note { margin-top: 30px; font-size: 12px; color: #888; }
 
-        /* Main Content — Hidden until unlocked */
-        #main-content { display: none; max-width: 900px; margin: 0 auto; }
-        header { text-align: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px solid #0066B3; }
-        h1 { color: #0066B3; font-size: 26px; margin-bottom: 5px; }
-        h2 { color: #0066B3; font-size: 22px; margin: 25px 0 12px; }
-        h3 { color: #005299; font-size: 18px; margin: 18px 0 8px; }
+        /* Main Content — YOUR ORIGINAL LOOK — hidden until unlocked */
+        #main-content { display: none; }
+
+        /* Everything below this is YOUR ORIGINAL STYLING — untouched */
+        h1 { font-size: 26px; margin: 20px 0 10px; color: #000; }
+        h2 { font-size: 20px; margin: 20px 0 8px; }
+        h3 { font-size: 17px; margin: 16px 0 6px; }
         .version { color: #666; font-size: 14px; margin-bottom: 15px; }
-        .disclaimer-banner {
-            background: #fff3cd; border-left: 4px solid #ffc107; padding: 12px 15px;
-            margin: 15px 0; border-radius: 4px; font-size: 14px;
-        }
-        .section-nav {
-            display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0;
-        }
-        .section-nav a {
-            background: #e9ecef; padding: 8px 14px; border-radius: 6px;
-            text-decoration: none; color: #0066B3; font-weight: 500;
-        }
-        .section-nav a:hover { background: #0066B3; color: white; }
-        .code-lookup {
-            display: flex; flex-wrap: wrap; gap: 10px; margin: 15px 0;
-        }
-        .code-btn {
-            background: #0066B3; color: white; padding: 8px 14px; border-radius: 6px;
-            font-weight: bold; text-decoration: none;
-        }
-        .code-btn:hover { background: #005299; }
-        .card {
-            background: white; border-radius: 10px; padding: 20px; margin: 15px 0;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-        }
-        .warning-box {
-            background: #f8d7da; border-left: 4px solid #dc3545; padding: 12px 15px;
-            margin: 12px 0; border-radius: 4px;
-        }
-        .success-box {
-            background: #d1e7dd; border-left: 4px solid #198754; padding: 12px 15px;
-            margin: 12px 0; border-radius: 4px;
-        }
-        .video-player {
-            background: #000; border-radius: 8px; padding: 15px; margin: 15px 0;
-        }
-        .video-input {
-            padding: 10px; width: 70%; border-radius: 4px; border: 1px solid #ddd; margin-right: 8px;
-        }
-        .video-load-btn {
-            padding: 10px 20px; background: #ff0000; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;
-        }
-        .part-number {
-            font-family: monospace; background: #e9ecef; padding: 2px 8px; border-radius: 4px; font-weight: bold;
-        }
+        hr { border: none; border-top: 1px solid #ccc; margin: 20px 0; }
         ul, ol { margin-left: 22px; margin-bottom: 12px; }
-        li { margin-bottom: 6px; }
-        hr { border: none; border-top: 1px solid #ddd; margin: 25px 0; }
-        footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; text-align: center; font-size: 13px; color: #777; }
+        li { margin-bottom: 5px; }
+        code, .part { font-family: monospace; background: #eee; padding: 2px 6px; border-radius: 3px; }
+        .warning { background: #fff3cd; border-left: 4px solid #ffc107; padding: 10px 14px; margin: 12px 0; }
+        .danger { background: #f8d7da; border-left: 4px solid #dc3545; padding: 10px 14px; margin: 12px 0; }
+        .video-area { background: #000; color: #fff; padding: 15px; border-radius: 6px; margin: 15px 0; }
+        input[type="text"] { padding: 8px; border-radius: 4px; border: 1px solid #ccc; width: 60%; }
+        button { padding: 8px 16px; cursor: pointer; }
+        nav { margin: 15px 0; }
+        nav a { margin-right: 10px; text-decoration: none; color: #0066B3; }
+        nav a:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
 
-<!-- 🔐 PASSWORD SCREEN -->
+<!-- 🔐 PASSWORD SCREEN — Password NOT visible anywhere -->
 <div id="password-screen">
-    <h1>🖨️ KM Technician Pro</h1>
-    <p class="subtitle">Independent Konica Minolta Technician Reference Tool</p>
+    <h1>🖨️ KONICA MINOLTA — TECHNICIAN PRO</h1>
+    <p>Independent technician reference tool<br>Not affiliated with or endorsed by Konica Minolta.</p>
     <input type="password" id="password-input" placeholder="Enter Password">
     <br>
     <button id="unlock-btn">🔓 Unlock Access</button>
     <div id="error-msg">❌ Incorrect password — please try again</div>
-    
-    <p class="disclaimer">
-        Not affiliated with or endorsed by Konica Minolta.<br>
-        Videos are for educational reference only.<br>
-        Always verify with official service documentation.
-    </p>
+    <p class="tiny-note">Videos for educational reference only.<br>Always verify with official service documentation.</p>
 </div>
 
-<!-- 📄 MAIN APP CONTENT — HIDDEN UNTIL UNLOCKED -->
+<!-- 📄 MAIN CONTENT — Your original look & layout restored -->
 <div id="main-content">
 
-    <header>
-        <h1>KONICA MINOLTA — TECHNICIAN PRO</h1>
-        <p class="version">Version 1.4 — Transfer Belt • Roller • Clutches • Motors • Video Player</p>
-        <p>Independent technician reference tool</p>
-        <p style="font-size: 13px; color: #777;">Not affiliated with or endorsed by Konica Minolta.</p>
-    </header>
+<h1>KONICA MINOLTA</h1>
+<h2>TECHNICIAN PRO</h2>
+<p class="version">Version 1.4 — ✅ Transfer Belt + Roller + Clutches + Motors + Video Player</p>
 
-    <div class="disclaimer-banner">
-        ⚠️ <strong>Safety Warning:</strong> Printer/copier servicing involves high voltage, high temperatures, moving machinery, and laser/imaging systems. Only trained personnel should perform service procedures. Always follow the manufacturer's official safety procedures.
-    </div>
+<p>Independent technician reference tool.<br>
+Not affiliated with or endorsed by Konica Minolta.<br>
+Videos are for educational reference only.</p>
 
-    <nav class="section-nav">
-        <a href="#dashboard">📊 Dashboard</a>
-        <a href="#models">🖨️ Models</a>
-        <a href="#errors">⚠️ Error Codes</a>
-        <a href="#jams">📄 Jam Codes</a>
-        <a href="#parts">🔧 Parts Finder</a>
-        <a href="#troubleshoot">🔍 Troubleshooting</a>
-        <a href="#maintenance">🧰 Maintenance</a>
-        <a href="#servicemode">🔑 Service Mode</a>
-        <a href="#printquality">🖼️ Print Quality</a>
-    </nav>
+<div class="warning">
+⚠️ <strong>WARNING:</strong> Printer/copier servicing involves high voltage, high temperatures, moving machinery, and laser/imaging systems. Only trained personnel should perform service procedures. Always follow the manufacturer's official safety procedures.
+</div>
 
-    <section id="dashboard">
-        <h2>📊 Technician Command Centre</h2>
-        
-        <h3>⚡ Quick Error Lookup</h3>
-        <p>Click any code to view details — or use search bar. 🎬 Video tutorials available on error pages.</p>
-        <div class="code-lookup">
-            <a href="#c0202" class="code-btn">C0202</a>
-            <a href="#c0204" class="code-btn">C0204</a>
-            <a href="#c0500" class="code-btn">C0500</a>
-            <a href="#c0601" class="code-btn">C0601</a>
-            <a href="#c2201" class="code-btn">C2201</a>
-            <a href="#c3401" class="code-btn">C3401</a>
-            <a href="#c2550" class="code-btn">C2550</a>
-        </div>
+<nav>
+📊 Dashboard 🖨️ Models ⚠️ Error Codes 📄 Jam Codes 🔧 Parts Finder 🔍 Troubleshooting 🧰 Maintenance 🔑 Service Mode 🖼️ Print Quality ⚙️ Settings
+</nav>
 
-        <h3>Quick Navigation</h3>
-        <ul>
-            <li><strong>🖨️ Models:</strong> C224e, C284e, C364e, C454e, C554e, C258, C308, C368+</li>
-            <li><strong>⚠️ Error Codes:</strong> Database + 🎬 Embedded video player</li>
-            <li><strong>🔧 Parts Finder:</strong> Belt • Roller • Drum • Fuser • Motor • Clutch</li>
-            <li><strong>🔍 Troubleshooting:</strong> Step-by-step diagnostic workflow</li>
-            <li><strong>🧰 Maintenance:</strong> PM schedules & replacement guides</li>
-            <li><strong>🔑 Service Mode:</strong> Access codes & counter resets</li>
-        </ul>
-    </section>
+<hr>
 
-    <hr>
+<h2>📊 TECHNICIAN COMMAND CENTRE</h2>
 
-    <section id="models">
-        <h2>🖨️ Model Database</h2>
-        <p>Search by model name or family. <em>Always verify part numbers with official Parts Catalogue.</em></p>
+<h3>⚡ Quick Error Lookup</h3>
+<p>Click any code to view details — or use search bar. 🎬 Video tutorials available on error pages.</p>
+<p><a href="#c0202" class="code">C0202</a> <a href="#c0204" class="code">C0204</a> <a href="#c0500" class="code">C0500</a> <a href="#c0601" class="code">C0601</a> <a href="#c2201" class="code">C2201</a> <a href="#c3401" class="code">C3401</a> <a href="#c2550" class="code">C2550</a></p>
 
-        <div class="card">
-            <h3>bizhub C-Series — e Generation (Colour)</h3>
-            <p><strong>Includes:</strong> C224e, C284e, C364e, C454e, C554e</p>
-            <p><strong>Speed:</strong> 22–55 ppm Colour & B&W</p>
-            <p><strong>Notes:</strong> DV512 developer, DR512 drum, TN512 toner, Transfer Belt <span class="part-number">A161R71300</span></p>
-        </div>
+<h3>🖨️ Models</h3>
+<p>C224e, C284e, C364e, C454e, C554e, C258, C308, C368+</p>
 
-        <div class="card">
-            <h3>bizhub C-Series — 8 Generation (Colour)</h3>
-            <p><strong>Includes:</strong> C226, C258, C308, C368, C458, C558, C658</p>
-            <p><strong>Speed:</strong> 22–65 ppm Colour & B&W</p>
-            <p><strong>Notes:</strong> DV313 developer, DR313 drum, TN324/TN319 toner, Transfer Belt <span class="part-number">A7UUR70400</span></p>
-        </div>
+<h3>⚠️ Error Codes</h3>
+<p>Database + 🎬 Embedded video player</p>
 
-        <div class="card">
-            <h3>bizhub i-Series & Classic Series</h3>
-            <p><strong>i-Series:</strong> bizhub 227, 287, 367, C227, C287, C368, C458, C558, C658</p>
-            <p><strong>Classic:</strong> C220, C280, C360, C452, C552, C652, C754, C654</p>
-            <p><strong>B&W Series:</strong> 223, 283, 363, 423, 501, 601, 751, 164/185/215/225i</p>
-        </div>
-    </section>
+<h3>🔧 Parts Finder</h3>
+<p>Belt • Roller • Drum • Fuser • Motor • Clutch</p>
 
-    <hr>
+<h3>🔍 Troubleshooting</h3>
+<p>Step-by-step diagnostic workflow</p>
 
-    <section id="errors">
-        <h2>⚠️ Error Code Database</h2>
-        
-        <div class="video-player">
-            <h3 style="color:white; margin-top:0;">🎬 Video Tutorial Player</h3>
-            <p style="color:#ccc; margin-bottom:10px;">Paste a YouTube video ID and click "Load Video"</p>
-            <input type="text" id="youtube-id" class="video-input" placeholder="e.g. dQw4w9WgXcQ">
-            <button class="video-load-btn" onclick="loadVideo()">▶ Load Video</button>
-            <div id="video-container" style="margin-top:15px; display:none;"></div>
-        </div>
+<h3>🧰 Maintenance</h3>
+<p>PM schedules & replacement guides</p>
 
-        <div class="card" id="c0202">
-            <h3>C0202 — Tray 1 Lift-Up Failure</h3>
-            <p><strong>Error Type:</strong> Paper Feed / Tray Mechanism</p>
-            <p><strong>Causes:</strong> Obstruction, wrong paper size, lift motor/sensor failure, mechanical bind, loose connector, failed lift clutch.</p>
-            <p><strong>Repair:</strong> Pull tray → clear obstructions → check clutch/motor → reseat connectors → clear error → test.</p>
-        </div>
+<h3>🔑 Service Mode</h3>
+<p>Access codes & counter resets</p>
 
-        <div class="card" id="c0601">
-            <h3>C0601 — Fuser Warm-Up Failure</h3>
-            <p><strong>Error Type:</strong> Fuser / Thermal System</p>
-            <p><strong>Severity:</strong> 🔴 CRITICAL</p>
-            <p><strong>Causes:</strong> Fuser not seated, dirty thermistor, blown thermofuse, burnt heater element, low voltage, fuser motor failure.</p>
-            <div class="warning-box">
-                ⚠️ <strong>Safety:</strong> Let cool 15+ minutes before service. Do NOT repeatedly reset — fire risk.
-            </div>
-        </div>
+<hr>
 
-        <div class="card" id="c2550">
-            <h3>C2550 — Black Developer Density Error</h3>
-            <p><strong>Error Type:</strong> Imaging / Developer Unit</p>
-            <p><strong>Causes:</strong> Dirty ID sensor, developer expired, wrong toner ratio, unit not seated, transfer belt contamination.</p>
-            <p><strong>Repair:</strong> Clean sensor → replace developer → run Auto Density Adjust → inspect belt → test.</p>
-        </div>
-    </section>
+<h2>🖨️ Model Database</h2>
+<p>Search by model name or family.</p>
 
-    <hr>
+<h3>bizhub C-Series — e Generation (Colour)</h3>
+<p><strong>Includes:</strong> C224e, C284e, C364e, C454e, C554e</p>
+<p><strong>Speed:</strong> 22–55 ppm Colour & B&W</p>
+<p><strong>Notes:</strong> DV512 developer, DR512 drum, TN512 toner, Transfer Belt <span class="part">A161R71300</span>.</p>
 
-    <section id="jams">
-        <h2>📄 Jam Codes & Paper Path</h2>
-        
-        <h3>General Jam Clearing Procedure</h3>
-        <ol>
-            <li>Locate indicator → 2. Open correct door → 3. Remove paper WITH direction of travel → 4. Check for scraps → 5. Clean sensors/rollers/transfer → 6. Verify paper size → 7. Close & test.</li>
-        </ol>
-        <div class="warning-box">
-            ⚠️ NEVER pull paper backward — damages sensors, transfer belt, and leaves fragments!
-        </div>
+<h3>bizhub C-Series — 8 Generation (Colour)</h3>
+<p><strong>Includes:</strong> C226, C258, C308, C368, C458, C558, C658</p>
+<p><strong>Speed:</strong> 22–65 ppm Colour & B&W</p>
+<p><strong>Notes:</strong> DV313 developer, DR313 drum, TN324/TN319 toner, Transfer Belt <span class="part">A7UUR70400</span>.</p>
 
-        <h3>Common Jam Locations</h3>
-        <ul>
-            <li><strong>Tray Feed Area:</strong> Feed roller, separation pad, paper size sensor, lift mechanism</li>
-            <li><strong>Transport Path:</strong> Guide plates, registration roller timing, paper dust on sensors</li>
-            <li><strong>Drum/Transfer Area:</strong> ⚠️ Remove carefully — do NOT scratch drum surface</li>
-            <li><strong>Fuser/Exit Area:</strong> ⚠️ HOT — Let cool first. Check exit sensor flags, separation fingers</li>
-            <li><strong>Finisher/Output:</strong> Exit gate, staple obstruction, tray alignment, stacker motor</li>
-        </ul>
-    </section>
+<h3>bizhub i-Series & Classic Series</h3>
+<p><strong>i-Series:</strong> bizhub 227, 287, 367, C227, C287, C368, C458, C558, C658</p>
+<p><strong>Classic:</strong> C220, C280, C360, C452, C552, C652, C754, C654</p>
+<p><strong>B&W Series:</strong> 223, 283, 363, 423, 501, 601, 751, 164/185/215/225i</p>
 
-    <hr>
+<hr>
 
-    <section id="parts">
-        <h2>🔧 Parts Finder & Cross-Reference</h2>
-        <p>Search by part number or description. <em>Verify all numbers with official Parts Catalogue before ordering.</em></p>
+<h2>⚠️ Error Code Database</h2>
 
-        <div class="card">
-            <h3>🔄 Transfer Belt Unit (Image Transfer Belt)</h3>
-            <p><strong>Part Numbers:</strong></p>
-            <ul>
-                <li><span class="part-number">A161R71300</span> — C224e, C284e, C364e, C454e, C554e</li>
-                <li><span class="part-number">A7UUR70400</span> — C258, C308, C368, C458, C558, C658</li>
-                <li><span class="part-number">A227R72911</span> — C220, C280, C360 series</li>
-            </ul>
-            <p><strong>Life Expectancy:</strong> ~100K–200K copies</p>
-            <p><strong>Symptoms:</strong> Colour misalignment, streaks, ghosting, density errors, C2201/C2202/C2301</p>
-            <p>🎬 <em>Related: Transfer Belt Replacement Video</em></p>
-        </div>
+<div class="video-area">
+<h3>🎬 Video Tutorial Player</h3>
+<p>Paste a YouTube video ID and click "Load Video"</p>
+<input type="text" id="youtube-id" placeholder="e.g. dQw4w9WgXcQ">
+<button onclick="loadVideo()">▶ Load Video</button>
+<div id="video-container" style="margin-top:15px; display:none;"></div>
+</div>
 
-        <div class="card">
-            <h3>🟠 Transfer Roller / Corona Unit</h3>
-            <p><strong>Part Numbers:</strong></p>
-            <ul>
-                <li><span class="part-number">A50UR70100</span> — C224e/C284e/C364e Secondary Transfer Roller</li>
-                <li><span class="part-number">A7UUR70300</span> — C258/C308/C368 Secondary Transfer Roller</li>
-                <li><span class="part-number">4034R70900</span> — B&W Transfer Roller (223/283/363/423)</li>
-            </ul>
-            <p><strong>Symptoms:</strong> Faded prints, incomplete transfer, background toner, voltage errors</p>
-        </div>
+<h3 id="c0202">C0202 — Tray 1 Lift-Up Failure</h3>
+<p><strong>Causes:</strong> Obstruction, wrong paper size, lift motor/sensor failure, mechanical bind, loose connector, failed lift clutch.</p>
+<p><strong>Repair:</strong> Pull tray → clear obstructions → check clutch/motor → reseat connectors → clear error → test.</p>
 
-        <div class="card">
-            <h3>⚙️ Clutches — Feed, Lift, Drive</h3>
-            <ul>
-                <li><strong>Tray Feed Clutch:</strong> Won't pick paper, double-feeds, clicks but no movement</li>
-                <li><strong>Tray Lift Clutch:</strong> Tray won't rise, error C0202/C0204, motor runs but no lift</li>
-                <li><strong>Developer/Main Drive Clutch:</strong> Intermittent image, density errors, C2550</li>
-                <li><strong>Duplex Clutch:</strong> Duplex jams, only one-sided printing</li>
-            </ul>
-            <p>🎬 <em>Related: Clutch Replacement Videos</em></p>
-        </div>
+<h3 id="c0601">C0601 — Fuser Warm-Up Failure</h3>
+<p><strong>Severity:</strong> 🔴 CRITICAL</p>
+<p><strong>Causes:</strong> Fuser not seated, dirty thermistor, blown thermofuse, burnt heater element, low voltage, fuser motor failure.</p>
+<div class="danger">
+⚠️ Let cool 15+ min before service. Do NOT repeatedly reset.
+</div>
 
-        <div class="card">
-            <h3>⚡ Motors — Main, Fuser, Scanner, Lift, Fan</h3>
-            <ul>
-                <li><strong>Main Drive Motor:</strong> Won't ready, C0500/C0550, no rotation</li>
-                <li><strong>Fuser Motor:</strong> Heater OK but no rotation, jams at exit, C0603/C0604</li>
-                <li><strong>Lift Motor:</strong> Tray won't rise, C0202/C0204, stripped gears</li>
-                <li><strong>Scanner Motor:</strong> Slow scan, home errors, copy cut off</li>
-                <li><strong>Laser Motor:</strong> Black copies, C2201/C2301, loud whine</li>
-                <li><strong>Fan Motor:</strong> C0500, overheating, shutdown</li>
-            </ul>
-            <p>🎬 <em>Related: Motor Testing & Replacement Videos</em></p>
-        </div>
+<h3 id="c2550">C2550 — Black Developer Density Error</h3>
+<p><strong>Causes:</strong> Dirty ID sensor, developer expired, wrong toner ratio, unit not seated, transfer belt contamination.</p>
+<p><strong>Repair:</strong> Clean sensor → replace developer → run Auto Density Adjust → inspect belt → test.</p>
 
-        <div class="card">
-            <h3>🧲 Developer Unit</h3>
-            <p><strong>DV512:</strong> C224e – C554e | <strong>DV313:</strong> C258 – C368</p>
-            <p><strong>Related Errors:</strong> C2550, C2551, C2552, C2553</p>
-            <p>🎬 <em>Related: Developer Unit Replacement & Calibration Video</em></p>
-        </div>
+<hr>
 
-        <div class="card">
-            <h3>🟢 Drum Unit</h3>
-            <p><strong>DR512:</strong> C224e – C554e | <strong>DR313:</strong> C258 – C368</p>
-            <p><strong>Symptoms:</strong> Streaks, background toner, repeating marks ~94mm spacing</p>
-            <p>🎬 <em>Related: Drum Unit Replacement Video</em></p>
-        </div>
+<h2>🔧 Parts Finder & Cross-Reference</h2>
+<p>Search by part number or description.</p>
 
-        <div class="card">
-            <h3>🔥 Fuser Unit</h3>
-            <p><strong>Related Errors:</strong> C0601, C0602, C0603, C3401</p>
-            <div class="warning-box">
-                ⚠️ <strong>CRITICAL:</strong> Verify voltage rating — 110V vs 220V. Wrong voltage = fire risk!
-            </div>
-            <p>🎬 <em>Related: Fuser Unit Replacement Video</em></p>
-        </div>
+<h3>🔄 Transfer Belt Unit (Image Transfer Belt)</h3>
+<p><strong>Part Numbers:</strong></p>
+<ul>
+<li><span class="part">A161R71300</span> — C224e, C284e, C364e, C454e, C554e</li>
+<li><span class="part">A7UUR70400</span> — C258, C308, C368, C458, C558, C658</li>
+<li><span class="part">A227R72911</span> — C220, C280, C360 series</li>
+</ul>
+<p><strong>Life:</strong> ~100K–200K copies</p>
+<p><strong>Symptoms:</strong> Colour misalignment, streaks, ghosting, density errors, C2201/C2202/C2301</p>
+<p>🎬 Replacement Video</p>
 
-        <div class="card">
-            <h3>🖐️ Feed Roller Set</h3>
-            <p>Pickup + Feed + Separation Pad — replace every 100K–150K copies</p>
-            <p><strong>Symptoms:</strong> Misfeeds, double-feeds, frequent jams</p>
-            <p>🎬 <em>Related: Feed Roller Replacement Video</em></p>
-        </div>
-    </section>
+<h3>🟠 Transfer Roller / Corona Unit</h3>
+<p><strong>Part Numbers:</strong></p>
+<ul>
+<li><span class="part">A50UR70100</span> — C224e/C284e/C364e Secondary Transfer Roller</li>
+<li><span class="part">A7UUR70300</span> — C258/C308/C368 Secondary Transfer Roller</li>
+<li><span class="part">4034R70900</span> — B&W Transfer Roller (223/283/363/423)</li>
+</ul>
+<p><strong>Symptoms:</strong> Faded prints, incomplete transfer, background toner, voltage errors</p>
+<p>🎬 Replacement Video</p>
 
-    <hr>
+<h3>⚙️ Clutches — Feed, Lift, Drive</h3>
+<ul>
+<li><strong>Tray Feed Clutch:</strong> Won't pick paper, double-feeds, clicks but no movement</li>
+<li><strong>Tray Lift Clutch:</strong> Tray won't rise, error C0202/C0204, motor runs but no lift</li>
+<li><strong>Developer/Main Drive Clutch:</strong> Intermittent image, density errors, C2550</li>
+<li><strong>Duplex Clutch:</strong> Duplex jams, only one-sided printing</li>
+</ul>
+<p>🎬 Clutch Videos</p>
 
-    <section id="troubleshoot">
-        <h2>🔍 Step-by-Step Troubleshooting</h2>
-        
-        <h3>Standard Service Procedure</h3>
-        <ol>
-            <li><strong>Identify:</strong> Exact model & serial number</li>
-            <li><strong>Error:</strong> Record full error code + sub-code + when it occurs</li>
-            <li><strong>Symptom:</strong> Copy? Print? Scan? Fax? Warm-up? Specific tray?</li>
-            <li><strong>Obvious:</strong> Paper, toner, doors, trays, power, environment</li>
-            <li><strong>Power Cycle:</strong> OFF → Wait 60 sec → ON → Does error return?</li>
-            <li><strong>Connectors:</strong> Reseat ALL harnesses (power OFF first)</li>
-            <li><strong>Sensors/Components:</strong> Clean sensors, belts, coronas → check clutch/motor operation</li>
-            <li><strong>Diagnostics:</strong> Service Mode → Input/Output checks → component tests</li>
-            <li><strong>Repair/Replace:</strong> Replace confirmed failed part</li>
-            <li><strong>Reset:</strong> Clear error history → reset counters → calibrate</li>
-            <li><strong>Verify:</strong> Test thoroughly → full function check → quality inspection</li>
-            <li><strong>Document:</strong> Record meter reading, work performed, parts used</li>
-        </ol>
-    </section>
+<h3>⚡ Motors — Main, Fuser, Scanner, Lift, Fan</h3>
+<ul>
+<li><strong>Main Drive Motor:</strong> Won't ready, C0500/C0550, no rotation</li>
+<li><strong>Fuser Motor:</strong> Heater OK but no rotation, jams at exit, C0603/C0604</li>
+<li><strong>Lift Motor:</strong> Tray won't rise, C0202/C0204, stripped gears</li>
+<li><strong>Scanner Motor:</strong> Slow scan, home errors, copy cut off</li>
+<li><strong>Laser Motor:</strong> Black copies, C2201/C2301, loud whine</li>
+<li><strong>Fan Motor:</strong> C0500, overheating, shutdown</li>
+</ul>
+<p>🎬 Motor Videos</p>
 
-    <hr>
+<h3>🧲 Developer Unit</h3>
+<p><strong>DV512:</strong> C224e–C554e | <strong>DV313:</strong> C258–C368</p>
+<p><strong>Errors:</strong> C2550, C2551, C2552, C2553</p>
+<p>🎬 Developer Video</p>
 
-    <section id="maintenance">
-        <h2>🧰 Maintenance Schedule</h2>
-        
-        <h3>Preventive Maintenance Intervals</h3>
-        <ul>
-            <li><strong>Every 50K copies / Monthly:</strong> Clean feed rollers, separation pads, paper path sensors, corona wire/grid, scanner glass, white reference plate</li>
-            <li><strong>Every 100K copies:</strong> Replace feed rollers & separation pads, inspect transfer belt, lubricate lift rails</li>
-            <li><strong>Every 200K copies:</strong> Replace transfer belt & roller assembly, fuser PM, scanner rails, clutch timing, motor gears</li>
-            <li><strong>Every 500K copies:</strong> Full PM Kit — developer, drum, belt, fuser, rollers, clutches, motors</li>
-        </ul>
-        <p style="font-size: 14px; color: #666; margin-top: 8px;">* Actual intervals vary by model, volume, paper quality, and environment. Always verify with your specific service manual.</p>
-    </section>
+<h3>🟢 Drum Unit</h3>
+<p><strong>DR512:</strong> C224e–C554e | <strong>DR313:</strong> C258–C368</p>
+<p><strong>Symptoms:</strong> Streaks, background, repeating marks ~94mm</p>
+<p>🎬 Drum Video</p>
 
-    <hr>
+<h3>🔥 Fuser Unit</h3>
+<p><strong>Errors:</strong> C0601, C0602, C0603, C3401</p>
+<div class="danger">
+⚠️ Verify voltage: 110V vs 220V — wrong = fire risk!
+</div>
+<p>🎬 Fuser Video</p>
 
-    <section id="servicemode">
-        <h2>🔑 Service Mode Access</h2>
-        
-        <div class="warning-box">
-            ⚠️ Changes critical machine operating parameters — record original values before making any adjustments!
-        </div>
+<h3>🖐️ Feed Roller Set</h3>
+<p>Pickup + Feed + Separation Pad — replace every 100K–150K copies</p>
+<p><strong>Symptoms:</strong> Misfeeds, double-feeds, frequent jams</p>
+<p>🎬 Roller Video</p>
 
-        <h3>Access Sequence — bizhub & Accurio Series</h3>
-        <p>Utility/Counter → Stop → 0 → 0 → Stop → 0 → 1</p>
-        <p><strong>Default Password:</strong> Usually 00000000 or 12345678</p>
-        
-        <h3>Common Functions</h3>
-        <ul>
-            <li><strong>System 1:</strong> Input check (sensor readings, temp, voltage), Output check (component test), Counters, Firmware</li>
-            <li><strong>System 2:</strong> Error history, clear errors, machine settings, network config, date/time</li>
-            <li><strong>Image Adjustment:</strong> Auto density calibration, colour registration, gradation, scanner calibration</li>
-            <li><strong>Counter/Life:</strong> Consumable counters reset — Drum, Developer, Fuser, Transfer Belt, Feed Rollers</li>
-        </ul>
-    </section>
+<hr>
 
-    <hr>
+<h2>📄 Jam Codes & Paper Path</h2>
+<h3>General Jam Clearing</h3>
+<ol>
+<li>Locate indicator → 2. Open door → 3. Remove paper WITH direction → 4. Check scraps → 5. Clean sensors/rollers/transfer → 6. Verify size → 7. Close & test.</li>
+</ol>
+<div class="warning">
+NEVER pull paper backward — damages sensors & belt!
+</div>
+<p>🎬 Jam Videos</p>
 
-    <section id="printquality">
-        <h2>🖼️ Print Quality Guide</h2>
-        
-        <ul>
-            <li><strong>Faded / Light Print:</strong> Toner/dev expired → dirty ID sensor → worn transfer belt/roller → belt contamination → clutch not engaging → wrong paper type → damp paper</li>
-            <li><strong>Streaks / Lines:</strong> Drum scratched → cleaning blade → fuser roller mark → laser scanner glass dusty → transfer belt scratch → corona dirty</li>
-            <li><strong>Ghosting / Repeat Marks:</strong> Fuser temperature → drum cleaning failure → belt blade → damp paper → motor speed variation → measure spacing to identify part</li>
-            <li><strong>Toner Not Fusing / Rubs Off:</strong> Thermistor displaced → wrong paper weight setting → fuser motor → pressure spring → counter expired → low mains voltage</li>
-        </ul>
-    </section>
+<hr>
 
-    <hr>
+<h2>🔍 Step-by-Step Troubleshooting</h2>
+<h3>Standard Service Procedure</h3>
+<p>1️⃣ Model & Serial → 2️⃣ Full Error Code → 3️⃣ When/where it happens → 4️⃣ Paper/toner/doors/power → 5️⃣ Power OFF 60 sec → ON → 6️⃣ Reseat ALL connectors → 7️⃣ Clean sensors/belt/coronas → check clutch/motor → 8️⃣ Service Mode I/O test → 9️⃣ Replace part → Reset counters → Calibrate → Test</p>
 
-    <section>
-        <h2>📝 Technician Work Log</h2>
-        <p style="color:#666; font-size:14px;">Data saved locally in your browser — nothing sent to server.</p>
-        <textarea placeholder="Record service details here..." style="width:100%; min-height:100px; padding:10px; border-radius:6px; border:1px solid #ddd; margin:10px 0;"></textarea>
-        <button style="padding:10px 20px; background:#0066B3; color:white; border:none; border-radius:6px; cursor:pointer; font-weight:600;">💾 Save Record</button>
-    </section>
+<hr>
 
-    <footer>
-        <p>KM Technician Pro v1.4 — Independent Reference Tool</p>
-        <p>⚠️ Always cross-reference with official Service Manual for your exact machine model.</p>
-        <p>Not affiliated with or endorsed by Konica Minolta.</p>
-    </footer>
+<h2>🧰 Maintenance Schedule</h2>
+<h3>Preventive Maintenance</h3>
+<ul>
+<li><strong>Every 50K:</strong> Clean rollers, sensors, glass, transfer corona, belt seals</li>
+<li><strong>Every 100K:</strong> Replace feed rollers, inspect belt, lubricate lift rails</li>
+<li><strong>Every 200K:</strong> Replace belt & transfer roller, fuser PM, scanner rails, clutch timing, motor gears</li>
+<li><strong>Every 500K:</strong> Full PM Kit — developer, drum, belt, fuser, rollers, clutches, motors</li>
+</ul>
+
+<hr>
+
+<h2>🔑 Service Mode Access</h2>
+<div class="warning">
+⚠️ Changes critical parameters — record values before changing!
+</div>
+<p><strong>Access Sequence:</strong> Utility/Counter → Stop → 0 → 0 → Stop → 0 → 1</p>
+<p><strong>Password:</strong> 00000000 or 12345678</p>
+<p><strong>Reset counters:</strong> Drum, Developer, Fuser, Transfer Belt, Roller, Feed</p>
+
+<hr>
+
+<h2>🖼️ Print Quality Guide</h2>
+<ul>
+<li><strong>Faded:</strong> Toner/dev expired → dirty sensor → worn transfer → belt contamination → clutch not engaging</li>
+<li><strong>Streaks:</strong> Drum scratched → blade → fuser mark → laser glass → belt scratch → corona dirty</li>
+<li><strong>Ghosting:</strong> Fuser temp → drum cleaning → belt blade → damp paper → motor speed</li>
+<li><strong>Not Fusing:</strong> Thermistor → wrong paper → fuser motor → pressure spring → expired counter</li>
+</ul>
+
+<hr>
+
+<h2>📝 Technician Work Log</h2>
+<h3>New Service Record</h3>
+<textarea style="width:100%; height:80px; padding:10px; margin:8px 0;" placeholder="Enter service details..."></textarea>
+<button>💾 Save Record</button>
+
+<h3>📋 Saved Records</h3>
+<p>No records yet.</p>
+
+<h2>⭐ Bookmarked Items</h2>
+<p>No bookmarks yet — click ⭐ on any error.</p>
+
+<h2>⚙️ Settings & Info</h2>
+<p><strong>App Info — v1.4</strong></p>
+<p>✅ Added: Transfer Belt, Transfer Roller, Clutches, Motors</p>
+<p>✅ Video Player: Paste YouTube ID → plays inside app</p>
+<div class="warning">
+⚠️ Always cross-reference with official Service Manual for your exact model.
+</div>
 
 </div>
 
